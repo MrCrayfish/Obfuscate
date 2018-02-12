@@ -1,5 +1,6 @@
 package com.mrcrayfish.obfuscate.client;
 
+import com.mrcrayfish.obfuscate.client.model.CustomModelPlayer;
 import com.mrcrayfish.obfuscate.client.model.layer.LayerCustomHeldItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
@@ -21,6 +22,7 @@ import java.util.Map;
 public class ClientEvents
 {
     private boolean setupThirdPerson = false;
+    private boolean setupPlayerRender = false;
 
     @SubscribeEvent
     public void onRenderPlayer(RenderPlayerEvent.Pre event)
@@ -35,6 +37,17 @@ public class ClientEvents
                 layers.add(new LayerCustomHeldItem(event.getRenderer()));
             }
             setupThirdPerson = true;
+        }
+
+        if(!setupPlayerRender)
+        {
+            Map<String, RenderPlayer> skinMap = ObfuscationReflectionHelper.getPrivateValue(RenderManager.class, Minecraft.getMinecraft().getRenderManager(), "field_178636_l");
+            if(skinMap != null)
+            {
+                ObfuscationReflectionHelper.setPrivateValue(RenderLivingBase.class, skinMap.get("default"), new CustomModelPlayer(0.0F, false), "field_77045_g");
+                ObfuscationReflectionHelper.setPrivateValue(RenderLivingBase.class, skinMap.get("slim"), new CustomModelPlayer(0.0F, true), "field_77045_g");
+            }
+            setupPlayerRender = true;
         }
     }
 }
