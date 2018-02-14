@@ -1,6 +1,6 @@
 package com.mrcrayfish.obfuscate.client.model.layer;
 
-import com.mrcrayfish.obfuscate.client.event.RenderHeldItemEvent;
+import com.mrcrayfish.obfuscate.client.event.RenderItemEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.GlStateManager;
@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHandSide;
-import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -69,7 +68,7 @@ public class LayerCustomHeldItem implements LayerRenderer<EntityLivingBase>
                 boolean isLeftHanded = handSide == EnumHandSide.LEFT;
                 GlStateManager.translate((float) (isLeftHanded ? -1 : 1) / 16.0F, 0.125F, -0.625F);
 
-                if(!MinecraftForge.EVENT_BUS.post(new RenderHeldItemEvent(entity, stack, transformType, handSide, partialTicks)))
+                if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held(entity, stack, transformType, handSide, partialTicks)))
                 {
                     Minecraft.getMinecraft().getItemRenderer().renderItemSide(entity, stack, transformType, isLeftHanded);
                 }
