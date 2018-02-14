@@ -94,4 +94,13 @@ public class RenderItemEvent extends Event
             }
         }
     }
+
+    @Cancelable
+    public static class Gui extends RenderItemEvent
+    {
+        public Gui(ItemStack heldItem)
+        {
+            super(heldItem, ItemCameraTransforms.TransformType.GROUND, 1.0F);
+        }
+    }
 }
