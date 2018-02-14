@@ -116,7 +116,7 @@ public class RenderCustomEntityItem extends RenderEntityItem
                 }
 
                 GlStateManager.pushMatrix();
-                boolean cancelled = MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity(entity, itemstack, partialTicks));
+                boolean cancelled = MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Pre(entity, itemstack, partialTicks));
                 GlStateManager.popMatrix();
 
                 if(!cancelled)
@@ -127,7 +127,7 @@ public class RenderCustomEntityItem extends RenderEntityItem
                     GlStateManager.popMatrix();
 
                     GlStateManager.pushMatrix();
-                    MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity(entity, itemstack, partialTicks));
+                    MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Post(entity, itemstack, partialTicks));
                     GlStateManager.popMatrix();
                 }
 
