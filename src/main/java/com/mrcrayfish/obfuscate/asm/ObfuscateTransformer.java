@@ -2,6 +2,8 @@ package com.mrcrayfish.obfuscate.asm;
 
 import com.mrcrayfish.obfuscate.Obfuscate;
 import com.mrcrayfish.obfuscate.client.event.RenderItemEvent;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.common.MinecraftForge;
 import org.objectweb.asm.ClassReader;
@@ -62,20 +64,36 @@ public class ObfuscateTransformer implements IClassTransformer
 
                     if(popNode != null)
                     {
-                        InsnList inject = new InsnList();
-                        inject.add(new LabelNode());
-                        inject.add(new FieldInsnNode(Opcodes.GETSTATIC, "net/minecraftforge/common/MinecraftForge", "EVENT_BUS", "Lnet/minecraftforge/fml/common/eventhandler/EventBus;"));
-                        inject.add(new TypeInsnNode(Opcodes.NEW, "com/mrcrayfish/obfuscate/client/event/RenderItemEvent$Gui"));
-                        inject.add(new InsnNode(Opcodes.DUP));
-                        inject.add(new VarInsnNode(Opcodes.ALOAD, 1));
-                        inject.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "com/mrcrayfish/obfuscate/client/event/RenderItemEvent$Gui", "<init>", "(Lnet/minecraft/item/ItemStack;)V", false));
-                        inject.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraftforge/fml/common/eventhandler/EventBus", "post", "(Lnet/minecraftforge/fml/common/eventhandler/Event;)Z", false));
+                        InsnList preEvent = new InsnList();
+                        preEvent.add(new LabelNode());
+                        preEvent.add(new FieldInsnNode(Opcodes.GETSTATIC, "net/minecraftforge/common/MinecraftForge", "EVENT_BUS", "Lnet/minecraftforge/fml/common/eventhandler/EventBus;"));
+                        preEvent.add(new TypeInsnNode(Opcodes.NEW, "com/mrcrayfish/obfuscate/client/event/RenderItemEvent$Gui$Pre"));
+                        preEvent.add(new InsnNode(Opcodes.DUP));
+                        preEvent.add(new VarInsnNode(Opcodes.ALOAD, 1));
+                        preEvent.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "com/mrcrayfish/obfuscate/client/event/RenderItemEvent$Gui$Pre", "<init>", "(Lnet/minecraft/item/ItemStack;)V", false));
+                        preEvent.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraftforge/fml/common/eventhandler/EventBus", "post", "(Lnet/minecraftforge/fml/common/eventhandler/Event;)Z", false));
 
                         LabelNode jumpNode = new LabelNode();
-                        inject.add(new JumpInsnNode(Opcodes.IFNE, jumpNode));
+                        preEvent.add(new JumpInsnNode(Opcodes.IFNE, jumpNode));
 
-                        method.instructions.insert(target, inject);
+                        //Inserts the RenderItemEvent.Gui.Pre event
+                        method.instructions.insert(target, preEvent);
+
+                        //Inserts the label node to jump to if the pre event is cancelled
                         method.instructions.insert(popNode, jumpNode);
+
+                        InsnList postEvent = new InsnList();
+                        postEvent.add(new LabelNode());
+                        postEvent.add(new FieldInsnNode(Opcodes.GETSTATIC, "net/minecraftforge/common/MinecraftForge", "EVENT_BUS", "Lnet/minecraftforge/fml/common/eventhandler/EventBus;"));
+                        postEvent.add(new TypeInsnNode(Opcodes.NEW, "com/mrcrayfish/obfuscate/client/event/RenderItemEvent$Gui$Post"));
+                        postEvent.add(new InsnNode(Opcodes.DUP));
+                        postEvent.add(new VarInsnNode(Opcodes.ALOAD, 1));
+                        postEvent.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "com/mrcrayfish/obfuscate/client/event/RenderItemEvent$Gui$Post", "<init>", "(Lnet/minecraft/item/ItemStack;)V", false));
+                        postEvent.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraftforge/fml/common/eventhandler/EventBus", "post", "(Lnet/minecraftforge/fml/common/eventhandler/Event;)Z", false));
+                        postEvent.add(new InsnNode(Opcodes.POP));
+
+                        //Inserts the RenderItemEvent.Gui.Post event
+                        method.instructions.insert(popNode, postEvent);
                     }
                 }
             }

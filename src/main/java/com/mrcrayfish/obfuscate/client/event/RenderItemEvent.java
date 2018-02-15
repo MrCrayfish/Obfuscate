@@ -39,6 +39,7 @@ public class RenderItemEvent extends Event
         return transformType;
     }
 
+    @Cancelable
     public static class Held extends RenderItemEvent
     {
         private EntityLivingBase entity;
@@ -60,8 +61,31 @@ public class RenderItemEvent extends Event
         {
             return handSide;
         }
+
+        public static class Pre extends Held
+        {
+            public Pre(EntityLivingBase entity, ItemStack heldItem, ItemCameraTransforms.TransformType transformType, EnumHandSide handSide, float partialTicks)
+            {
+                super(entity, heldItem, transformType, handSide, partialTicks);
+            }
+        }
+
+        public static class Post extends Held
+        {
+            public Post(EntityLivingBase entity, ItemStack heldItem, ItemCameraTransforms.TransformType transformType, EnumHandSide handSide, float partialTicks)
+            {
+                super(entity, heldItem, transformType, handSide, partialTicks);
+            }
+
+            @Override
+            public boolean isCancelable()
+            {
+                return false;
+            }
+        }
     }
 
+    @Cancelable
     public static class Entity extends RenderItemEvent
     {
         private EntityItem entity;
@@ -77,7 +101,6 @@ public class RenderItemEvent extends Event
             return entity;
         }
 
-        @Cancelable
         public static class Pre extends Entity
         {
             public Pre(EntityItem entity, ItemStack heldItem, float partialTicks)
@@ -92,6 +115,12 @@ public class RenderItemEvent extends Event
             {
                 super(entity, heldItem, partialTicks);
             }
+
+            @Override
+            public boolean isCancelable()
+            {
+                return false;
+            }
         }
     }
 
@@ -100,7 +129,29 @@ public class RenderItemEvent extends Event
     {
         public Gui(ItemStack heldItem)
         {
-            super(heldItem, ItemCameraTransforms.TransformType.GROUND, 1.0F);
+            super(heldItem, ItemCameraTransforms.TransformType.GROUND, 0.0F);
+        }
+
+        public static class Pre extends Gui
+        {
+            public Pre(ItemStack heldItem)
+            {
+                super(heldItem);
+            }
+        }
+
+        public static class Post extends Gui
+        {
+            public Post(ItemStack heldItem)
+            {
+                super(heldItem);
+            }
+
+            @Override
+            public boolean isCancelable()
+            {
+                return false;
+            }
         }
     }
 }

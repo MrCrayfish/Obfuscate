@@ -68,9 +68,10 @@ public class LayerCustomHeldItem implements LayerRenderer<EntityLivingBase>
                 boolean isLeftHanded = handSide == EnumHandSide.LEFT;
                 GlStateManager.translate((float) (isLeftHanded ? -1 : 1) / 16.0F, 0.125F, -0.625F);
 
-                if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held(entity, stack, transformType, handSide, partialTicks)))
+                if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held.Pre(entity, stack, transformType, handSide, partialTicks)))
                 {
                     Minecraft.getMinecraft().getItemRenderer().renderItemSide(entity, stack, transformType, isLeftHanded);
+                    MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held.Post(entity, stack, transformType, handSide, partialTicks));
                 }
             }
             GlStateManager.popMatrix();
