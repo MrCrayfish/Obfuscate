@@ -31,14 +31,21 @@ public class CustomModelPlayer extends ModelPlayer
         }
     }
 
+    @Override
+    public void render(Entity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale)
+    {
+        if(!MinecraftForge.EVENT_BUS.post(new ModelPlayerEvent.Render.Pre((EntityPlayer) entityIn, this, ageInTicks - entityIn.ticksExisted)))
+        {
+            super.render(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+            MinecraftForge.EVENT_BUS.post(new ModelPlayerEvent.Render.Post((EntityPlayer) entityIn, this, ageInTicks - entityIn.ticksExisted));
+        }
+    }
+
     private void resetRotationAngles()
     {
         this.resetAll(bipedHead);
-
         this.resetAll(bipedHeadwear);
-
         this.resetAll(bipedBody);
-
         this.resetAll(bipedBodyWear);
 
         this.resetAll(bipedRightArm);
