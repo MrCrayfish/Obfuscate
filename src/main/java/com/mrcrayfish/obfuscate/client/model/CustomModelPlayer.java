@@ -23,18 +23,12 @@ public class CustomModelPlayer extends ModelPlayer
     @Override
     public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn)
     {
+        this.resetRotationAngles();
         if(!MinecraftForge.EVENT_BUS.post(new ModelPlayerEvent.SetupAngles.Pre((EntityPlayer) entityIn, this, ageInTicks - entityIn.ticksExisted)))
         {
             super.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entityIn);
             MinecraftForge.EVENT_BUS.post(new ModelPlayerEvent.SetupAngles.Post((EntityPlayer) entityIn, this, ageInTicks - entityIn.ticksExisted));
         }
-    }
-
-    @Override
-    public void render(Entity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale)
-    {
-        super.render(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
-        this.resetRotationAngles();
     }
 
     private void resetRotationAngles()
