@@ -129,7 +129,7 @@ public class RenderItemEvent extends Event
     {
         public Gui(ItemStack heldItem)
         {
-            super(heldItem, ItemCameraTransforms.TransformType.GROUND, 0.0F);
+            super(heldItem, ItemCameraTransforms.TransformType.GUI, 0.0F);
         }
 
         public static class Pre extends Gui
