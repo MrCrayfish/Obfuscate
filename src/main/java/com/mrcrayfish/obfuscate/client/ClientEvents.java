@@ -3,6 +3,8 @@ package com.mrcrayfish.obfuscate.client;
 import com.mrcrayfish.obfuscate.client.model.CustomModelPlayer;
 import com.mrcrayfish.obfuscate.client.model.layer.LayerCustomHeldItem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
@@ -28,12 +30,10 @@ public class ClientEvents
     {
         if(!setupPlayerRender)
         {
-            Map<String, RenderPlayer> skinMap = ObfuscationReflectionHelper.getPrivateValue(RenderManager.class, Minecraft.getMinecraft().getRenderManager(), "field_178636_l");
-            if(skinMap != null)
-            {
-                this.patchPlayerRender(skinMap.get("default"), false);
-                this.patchPlayerRender(skinMap.get("slim"), true);
-            }
+            Render render = Minecraft.getMinecraft().getRenderManager().getEntityClassRenderObject(AbstractClientPlayer.class);
+            Map<String, RenderPlayer> skinMap = render.getRenderManager().getSkinMap();
+            this.patchPlayerRender(skinMap.get("default"), false);
+            this.patchPlayerRender(skinMap.get("slim"), true);
             setupPlayerRender = true;
         }
     }
