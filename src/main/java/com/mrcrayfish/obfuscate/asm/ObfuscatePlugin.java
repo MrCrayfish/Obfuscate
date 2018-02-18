@@ -1,5 +1,6 @@
 package com.mrcrayfish.obfuscate.asm;
 
+import com.mrcrayfish.obfuscate.Obfuscate;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 import javax.annotation.Nullable;
@@ -22,7 +23,7 @@ public class ObfuscatePlugin implements IFMLLoadingPlugin
     @Override
     public String getModContainerClass()
     {
-        return null;
+        return Obfuscate.class.getName();
     }
 
     @Nullable

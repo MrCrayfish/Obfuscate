@@ -1,11 +1,7 @@
 package com.mrcrayfish.obfuscate.asm;
 
 import com.mrcrayfish.obfuscate.Obfuscate;
-import com.mrcrayfish.obfuscate.client.event.RenderItemEvent;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraftforge.common.MinecraftForge;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
