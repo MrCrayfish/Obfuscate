@@ -3,9 +3,11 @@ package com.mrcrayfish.obfuscate.client.model.layer;
 import com.mrcrayfish.obfuscate.client.event.RenderItemEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBiped;
+import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
+import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
@@ -68,13 +70,30 @@ public class LayerCustomHeldItem implements LayerRenderer<EntityLivingBase>
                 boolean isLeftHanded = handSide == EnumHandSide.LEFT;
                 GlStateManager.translate((float) (isLeftHanded ? -1 : 1) / 16.0F, 0.125F, -0.625F);
 
-                if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held.Pre(entity, stack, transformType, handSide, partialTicks)))
+                if(this.isArmVisible(handSide))
                 {
-                    Minecraft.getMinecraft().getItemRenderer().renderItemSide(entity, stack, transformType, isLeftHanded);
-                    MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held.Post(entity, stack, transformType, handSide, partialTicks));
+                    if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held.Pre(entity, stack, transformType, handSide, partialTicks)))
+                    {
+                        Minecraft.getMinecraft().getItemRenderer().renderItemSide(entity, stack, transformType, isLeftHanded);
+                        MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held.Post(entity, stack, transformType, handSide, partialTicks));
+                    }
                 }
             }
             GlStateManager.popMatrix();
+        }
+    }
+
+    private boolean isArmVisible(EnumHandSide handSide)
+    {
+        RenderPlayer render = (RenderPlayer) livingEntityRenderer;
+        switch(handSide)
+        {
+            case LEFT:
+                return !render.getMainModel().bipedLeftArm.isHidden && render.getMainModel().bipedLeftArm.showModel;
+            case RIGHT:
+                return !render.getMainModel().bipedRightArm.isHidden && render.getMainModel().bipedRightArm.showModel;
+            default:
+                return false;
         }
     }
 
