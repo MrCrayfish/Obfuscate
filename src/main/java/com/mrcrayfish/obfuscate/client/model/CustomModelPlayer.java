@@ -34,6 +34,7 @@ public class CustomModelPlayer extends ModelPlayer
     @Override
     public void render(Entity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale)
     {
+        this.resetVisibilities();
         if(!MinecraftForge.EVENT_BUS.post(new ModelPlayerEvent.Render.Pre((EntityPlayer) entityIn, this, ageInTicks - entityIn.ticksExisted)))
         {
             super.render(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
@@ -96,5 +97,22 @@ public class CustomModelPlayer extends ModelPlayer
         renderer.rotationPointX = 0.0F;
         renderer.rotationPointY = 0.0F;
         renderer.rotationPointZ = 0.0F;
+    }
+
+    private void resetVisibilities()
+    {
+        this.setVisible(true);
+        this.bipedLeftArmwear.isHidden = false;
+        this.bipedRightArmwear.isHidden = false;
+        this.bipedLeftLegwear.isHidden = false;
+        this.bipedRightLegwear.isHidden = false;
+        this.bipedBodyWear.isHidden = false;
+        this.bipedHead.isHidden = false;
+        this.bipedHeadwear.isHidden = false;
+        this.bipedBody.isHidden = false;
+        this.bipedRightArm.isHidden = false;
+        this.bipedLeftArm.isHidden = false;
+        this.bipedRightLeg.isHidden = false;
+        this.bipedLeftLeg.isHidden = false;
     }
 }
