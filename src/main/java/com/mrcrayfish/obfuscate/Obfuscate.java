@@ -7,12 +7,9 @@ import com.mrcrayfish.obfuscate.proxy.CommonProxy;
 import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.event.FMLConstructionEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.sql.Ref;
 
 /**
  * Author: MrCrayfish
@@ -30,7 +27,7 @@ public class Obfuscate extends DummyModContainer
         meta.modId       = "obfuscate";
         meta.name        = "Obfuscate";
         meta.description = "A library which introduces more events for modders.";
-        meta.version     = "0.1.0";
+        meta.version     = "0.2.1";
         meta.authorList  = Lists.newArrayList("MrCrayfish");
         meta.credits     = "Cheers to these people for donating during the development: Fabbe50, Infinite Worlds, ALBERT, Mastef Chief, OstenTV, Robert Finley, PlayDashGaming, Shadow Bill-cat";
         meta.url         = "https://mrcrayfish.com";
