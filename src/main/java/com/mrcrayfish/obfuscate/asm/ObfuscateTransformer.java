@@ -22,9 +22,10 @@ public class ObfuscateTransformer implements IClassTransformer
         if(bytes == null)
             return null;
 
-        if(name.equals("net.minecraft.client.renderer.RenderItem"))
+        boolean isObfuscated = !name.equals(transformedName);
+        if(transformedName.equals("net.minecraft.client.renderer.RenderItem"))
         {
-            return patchRenderItem(basicClass);
+            return patchRenderItem(bytes, isObfuscated);
         }
         else if(transformedName.equals("net.minecraft.entity.EntityLivingBase"))
         {
@@ -33,7 +34,7 @@ public class ObfuscateTransformer implements IClassTransformer
         return bytes;
     }
 
-    private byte[] patchRenderItem(byte[] bytes)
+    private byte[] patchRenderItem(byte[] bytes, boolean isObfuscated)
     {
         Obfuscate.LOGGER.info("Applying ASM to RenderItem");
 
@@ -41,16 +42,20 @@ public class ObfuscateTransformer implements IClassTransformer
         ClassReader classReader = new ClassReader(bytes);
         classReader.accept(classNode, 0);
 
+        String methodName = isObfuscated ? "func_191962_a" : "renderItemModelIntoGUI";
+        String params = "(Lnet/minecraft/item/ItemStack;IILnet/minecraft/client/renderer/block/model/IBakedModel;)V";
+        String nextInstruction = isObfuscated ? "func_180452_a" : "setupGuiTransform";
+
         for(MethodNode method : classNode.methods)
         {
-            if((method.name.equals("renderItemModelIntoGUI")) && (method.desc.equals("(Lnet/minecraft/item/ItemStack;IILnet/minecraft/client/renderer/block/model/IBakedModel;)V")))
+            if((method.name.equals(methodName)) && (method.desc.equals(params)))
             {
                 AbstractInsnNode target = null;
                 for(AbstractInsnNode instruction : method.instructions.toArray())
                 {
                     if(instruction.getOpcode() == Opcodes.INVOKESPECIAL)
                     {
-                        if("setupGuiTransform".equals(((MethodInsnNode) instruction).name) && instruction.getPrevious().getOpcode() == Opcodes.INVOKEINTERFACE)
+                        if(nextInstruction.equals(((MethodInsnNode) instruction).name) && instruction.getPrevious().getOpcode() == Opcodes.INVOKEINTERFACE)
                         {
                             target = instruction;
                             break;
@@ -82,9 +87,6 @@ public class ObfuscateTransformer implements IClassTransformer
                         //Inserts the RenderItemEvent.Gui.Pre event
                         method.instructions.insert(target, preEvent);
 
-                        //Inserts the label node to jump to if the pre event is cancelled
-                        method.instructions.insert(popNode, jumpNode);
-
                         InsnList postEvent = new InsnList();
                         postEvent.add(new LabelNode());
                         postEvent.add(new FieldInsnNode(Opcodes.GETSTATIC, "net/minecraftforge/common/MinecraftForge", "EVENT_BUS", "Lnet/minecraftforge/fml/common/eventhandler/EventBus;"));
@@ -95,14 +97,21 @@ public class ObfuscateTransformer implements IClassTransformer
                         postEvent.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraftforge/fml/common/eventhandler/EventBus", "post", "(Lnet/minecraftforge/fml/common/eventhandler/Event;)Z", false));
                         postEvent.add(new InsnNode(Opcodes.POP));
 
+                        //Inserts the label node to jump to if the pre event is cancelled
+                        postEvent.add(jumpNode);
+                        postEvent.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
+
                         //Inserts the RenderItemEvent.Gui.Post event
                         method.instructions.insert(popNode, postEvent);
+
+                        Obfuscate.LOGGER.info("Successfully patched RenderItem");
+                        break;
                     }
                 }
             }
         }
 
-        ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+        ClassWriter writer = new ClassWriter(0);
         classNode.accept(writer);
         return writer.toByteArray();
     }
