@@ -1,12 +1,11 @@
 package com.mrcrayfish.obfuscate.client;
 
-import com.mrcrayfish.obfuscate.client.model.CustomModelPlayer;
 import com.mrcrayfish.obfuscate.client.model.layer.LayerCustomHeldItem;
+import com.mrcrayfish.obfuscate.client.model.CustomModelPlayer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerHeldItem;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;

@@ -1,7 +1,11 @@
 package com.mrcrayfish.obfuscate.asm;
 
 import com.mrcrayfish.obfuscate.Obfuscate;
+import com.mrcrayfish.obfuscate.client.event.RenderItemEvent;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraftforge.common.MinecraftForge;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -13,17 +17,20 @@ import org.objectweb.asm.tree.*;
 public class ObfuscateTransformer implements IClassTransformer
 {
     @Override
-    public byte[] transform(String name, String transformedName, byte[] basicClass)
+    public byte[] transform(String name, String transformedName, byte[] bytes)
     {
-        if(basicClass == null)
+        if(bytes == null)
             return null;
 
         if(name.equals("net.minecraft.client.renderer.RenderItem"))
         {
             return patchRenderItem(basicClass);
         }
-
-        return basicClass;
+        else if(transformedName.equals("net.minecraft.entity.EntityLivingBase"))
+        {
+            return patchEntityLivingBase(bytes, isObfuscated);
+        }
+        return bytes;
     }
 
     private byte[] patchRenderItem(byte[] bytes)
@@ -98,5 +105,43 @@ public class ObfuscateTransformer implements IClassTransformer
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
         classNode.accept(writer);
         return writer.toByteArray();
+    }
+
+    private byte[] patchEntityLivingBase(byte[] bytes, boolean isObfuscated)
+    {
+        Obfuscate.LOGGER.info("Applying ASM to EntityLivingBase");
+
+        ClassNode classNode = new ClassNode();
+        ClassReader classReader = new ClassReader(bytes);
+        classReader.accept(classNode, 0);
+
+        String methodName = isObfuscated ? "func_70088_a" : "entityInit";
+
+        for(MethodNode method : classNode.methods)
+        {
+            if((method.name.equals(methodName)) && (method.desc.equals("()V")))
+            {
+                AbstractInsnNode target = method.instructions.getFirst();
+
+                InsnList eventList = new InsnList();
+                eventList.add(new LabelNode());
+                eventList.add(new FieldInsnNode(Opcodes.GETSTATIC, "net/minecraftforge/common/MinecraftForge", "EVENT_BUS", "Lnet/minecraftforge/fml/common/eventhandler/EventBus;"));
+                eventList.add(new TypeInsnNode(Opcodes.NEW, "com/mrcrayfish/obfuscate/common/event/EntityLivingInitEvent"));
+                eventList.add(new InsnNode(Opcodes.DUP));
+                eventList.add(new VarInsnNode(Opcodes.ALOAD, 0));
+                eventList.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "com/mrcrayfish/obfuscate/common/event/EntityLivingInitEvent", "<init>", "(Lnet/minecraft/entity/EntityLivingBase;)V", false));
+                eventList.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "net/minecraftforge/fml/common/eventhandler/EventBus", "post", "(Lnet/minecraftforge/fml/common/eventhandler/Event;)Z", false));
+                eventList.add(new InsnNode(Opcodes.POP));
+
+                method.instructions.insertBefore(target, eventList);
+
+                Obfuscate.LOGGER.info("Successfully patched EntityLivingBase");
+                break;
+            }
+        }
+
+        ClassWriter classWriter = new ClassWriter(0);
+        classNode.accept(classWriter);
+        return classWriter.toByteArray();
     }
 }
