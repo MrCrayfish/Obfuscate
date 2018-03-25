@@ -22,3 +22,7 @@ eclipse
 run
 
 classes
+docs
+
+publish.bat
+publish-output.log
