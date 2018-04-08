@@ -29,6 +29,7 @@ public class CustomModelPlayer extends ModelPlayer
             super.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entityIn);
             MinecraftForge.EVENT_BUS.post(new ModelPlayerEvent.SetupAngles.Post((EntityPlayer) entityIn, this, ageInTicks - entityIn.ticksExisted));
         }
+        this.setupRotationAngles();
     }
 
     @Override
@@ -40,6 +41,16 @@ public class CustomModelPlayer extends ModelPlayer
             super.render(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
             MinecraftForge.EVENT_BUS.post(new ModelPlayerEvent.Render.Post((EntityPlayer) entityIn, this, ageInTicks - entityIn.ticksExisted));
         }
+    }
+
+    private void setupRotationAngles()
+    {
+        copyModelAngles(bipedRightArm, bipedRightArmwear);
+        copyModelAngles(bipedLeftArm, bipedLeftArmwear);
+        copyModelAngles(bipedRightLeg, bipedRightLegwear);
+        copyModelAngles(bipedLeftLeg, bipedLeftLegwear);
+        copyModelAngles(bipedBody, bipedBodyWear);
+        copyModelAngles(bipedHead, bipedHeadwear);
     }
 
     private void resetRotationAngles()
