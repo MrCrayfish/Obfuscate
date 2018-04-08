@@ -112,14 +112,7 @@ public class CustomModelPlayer extends ModelPlayer
 
     private void resetVisibilities()
     {
-        this.setVisible(true);
-        this.bipedLeftArmwear.isHidden = false;
-        this.bipedRightArmwear.isHidden = false;
-        this.bipedLeftLegwear.isHidden = false;
-        this.bipedRightLegwear.isHidden = false;
-        this.bipedBodyWear.isHidden = false;
         this.bipedHead.isHidden = false;
-        this.bipedHeadwear.isHidden = false;
         this.bipedBody.isHidden = false;
         this.bipedRightArm.isHidden = false;
         this.bipedLeftArm.isHidden = false;
