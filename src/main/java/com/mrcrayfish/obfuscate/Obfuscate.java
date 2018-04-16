@@ -27,7 +27,7 @@ public class Obfuscate extends DummyModContainer
         meta.modId       = "obfuscate";
         meta.name        = "Obfuscate";
         meta.description = "A library which introduces more events for modders.";
-        meta.version     = "0.2.3";
+        meta.version     = "0.2.4";
         meta.authorList  = Lists.newArrayList("MrCrayfish");
         meta.credits     = "Cheers to these people for donating during the development: Fabbe50, Infinite Worlds, ALBERT, Mastef Chief, OstenTV, Robert Finley, PlayDashGaming, Shadow Bill-cat";
         meta.url         = "https://mrcrayfish.com";
