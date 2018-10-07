@@ -27,10 +27,6 @@ public class ObfuscateTransformer implements IClassTransformer
         {
             return patchRenderItem(bytes, isObfuscated);
         }
-        else if(transformedName.equals("net.minecraft.entity.EntityLivingBase"))
-        {
-            return patchEntityLivingBase(bytes, isObfuscated);
-        }
         return bytes;
     }
 
@@ -119,7 +115,8 @@ public class ObfuscateTransformer implements IClassTransformer
         return writer.toByteArray();
     }
 
-    private byte[] patchEntityLivingBase(byte[] bytes, boolean isObfuscated)
+    //Leaving the code here as an example in case I need to refresh my mind about ASM
+    /*private byte[] patchEntityLivingBase(byte[] bytes, boolean isObfuscated)
     {
         Obfuscate.LOGGER.info("Applying ASM to EntityLivingBase");
 
@@ -155,5 +152,5 @@ public class ObfuscateTransformer implements IClassTransformer
         ClassWriter classWriter = new ClassWriter(0);
         classNode.accept(classWriter);
         return classWriter.toByteArray();
-    }
+    }*/
 }
