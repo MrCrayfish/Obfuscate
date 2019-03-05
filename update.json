@@ -1,0 +1,13 @@
+{
+    "homepage": "https://mrcrayfish.com/mods?id=obfuscate",
+    "promos": {
+        "1.13.2-latest": "1.13.2-0.3.0",
+        "1.12.2-latest": "1.12.2-0.2.6"
+    },
+    "1.13.2": {
+        "1.13.2-0.3.0": "MrCrayfish: Updated to 1.13.2"
+    },
+    "1.12.2": {
+        "1.12.2-0.2.6": "MrCrayfish: Fixed startup crash on recommended Forge"
+    }
+}

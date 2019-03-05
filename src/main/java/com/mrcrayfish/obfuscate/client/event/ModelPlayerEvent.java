@@ -1,9 +1,9 @@
 package com.mrcrayfish.obfuscate.client.event;
 
-import net.minecraft.client.model.ModelPlayer;
+import net.minecraft.client.renderer.entity.model.ModelPlayer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.fml.common.eventhandler.Cancelable;
+import net.minecraftforge.eventbus.api.Cancelable;
 
 /**
  * Author: MrCrayfish

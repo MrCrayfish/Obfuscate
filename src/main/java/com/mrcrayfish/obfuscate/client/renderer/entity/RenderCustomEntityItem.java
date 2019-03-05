@@ -1,40 +1,40 @@
 package com.mrcrayfish.obfuscate.client.renderer.entity;
 
 import com.mrcrayfish.obfuscate.client.event.RenderItemEvent;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.RenderItem;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.RenderEntityItem;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.Constants;
 
 import java.util.Random;
 
 /**
  * Author: MrCrayfish
  */
+@OnlyIn(Dist.CLIENT)
 public class RenderCustomEntityItem extends RenderEntityItem
 {
-    private final RenderItem renderItem;
+    private final ItemRenderer itemRenderer;
     private final Random random = new Random();
 
-    public RenderCustomEntityItem(RenderManager renderManagerIn, RenderItem renderItem)
+    public RenderCustomEntityItem(RenderManager renderManagerIn, ItemRenderer itemRenderer)
     {
-        super(renderManagerIn, renderItem);
-        this.renderItem = renderItem;
+        super(renderManagerIn, itemRenderer);
+        this.itemRenderer = itemRenderer;
     }
 
-    private int transformModelCount(EntityItem itemIn, double p_177077_2_, double p_177077_4_, double p_177077_6_, float p_177077_8_, IBakedModel p_177077_9_)
+    private int transformModelCount(EntityItem itemIn, double x, double y, double z, float p_177077_8_, IBakedModel p_177077_9_)
     {
         ItemStack itemstack = itemIn.getItem();
         Item item = itemstack.getItem();
@@ -47,18 +47,17 @@ public class RenderCustomEntityItem extends RenderEntityItem
         {
             boolean flag = p_177077_9_.isGui3d();
             int i = this.getModelCount(itemstack);
-            float f = 0.25F;
             float f1 = shouldBob() ? MathHelper.sin(((float)itemIn.getAge() + p_177077_8_) / 10.0F + itemIn.hoverStart) * 0.1F + 0.1F : 0;
-            float f2 = p_177077_9_.getItemCameraTransforms().getTransform(ItemCameraTransforms.TransformType.GROUND).scale.y;
-            GlStateManager.translate((float)p_177077_2_, (float)p_177077_4_ + f1 + 0.25F * f2, (float)p_177077_6_);
+            float f2 = p_177077_9_.getItemCameraTransforms().getTransform(ItemCameraTransforms.TransformType.GROUND).scale.getY();
+            GlStateManager.translatef((float)x, (float)y + f1 + 0.25F * f2, (float)z);
 
             if (flag || this.renderManager.options != null)
             {
                 float f3 = (((float)itemIn.getAge() + p_177077_8_) / 20.0F + itemIn.hoverStart) * (180F / (float)Math.PI);
-                GlStateManager.rotate(f3, 0.0F, 1.0F, 0.0F);
+                GlStateManager.rotatef(f3, 0.0F, 1.0F, 0.0F);
             }
 
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             return i;
         }
     }
@@ -67,13 +66,13 @@ public class RenderCustomEntityItem extends RenderEntityItem
     public void doRender(EntityItem entity, double x, double y, double z, float entityYaw, float partialTicks)
     {
         ItemStack itemstack = entity.getItem();
-        int i = itemstack.isEmpty() ? 187 : Item.getIdFromItem(itemstack.getItem()) + itemstack.getMetadata();
+        int i = itemstack.isEmpty() ? 187 : Item.getIdFromItem(itemstack.getItem()) + itemstack.getDamage();
         this.random.setSeed((long)i);
         boolean flag = false;
 
         if (this.bindEntityTexture(entity))
         {
-            this.renderManager.renderEngine.getTexture(this.getEntityTexture(entity)).setBlurMipmap(false, false);
+            this.renderManager.textureManager.getTexture(this.getEntityTexture(entity)).setBlurMipmap(false, false);
             flag = true;
         }
 
@@ -81,9 +80,9 @@ public class RenderCustomEntityItem extends RenderEntityItem
         GlStateManager.alphaFunc(516, 0.1F);
         GlStateManager.enableBlend();
         RenderHelper.enableStandardItemLighting();
-        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.pushMatrix();
-        IBakedModel ibakedmodel = this.renderItem.getItemModelWithOverrides(itemstack, entity.world, (EntityLivingBase)null);
+        IBakedModel ibakedmodel = this.itemRenderer.getItemModelWithOverrides(itemstack, entity.world, (EntityLivingBase)null);
         int j = this.transformModelCount(entity, x, y, z, partialTicks, ibakedmodel);
         boolean flag1 = ibakedmodel.isGui3d();
 
@@ -92,7 +91,7 @@ public class RenderCustomEntityItem extends RenderEntityItem
             float f3 = -0.0F * (float)(j - 1) * 0.5F;
             float f4 = -0.0F * (float)(j - 1) * 0.5F;
             float f5 = -0.09375F * (float)(j - 1) * 0.5F;
-            GlStateManager.translate(f3, f4, f5);
+            GlStateManager.translatef(f3, f4, f5);
         }
 
         if (this.renderOutlines)
@@ -112,7 +111,7 @@ public class RenderCustomEntityItem extends RenderEntityItem
                     float f7 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
                     float f9 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
                     float f6 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
-                    GlStateManager.translate(shouldSpreadItems() ? f7 : 0, shouldSpreadItems() ? f9 : 0, f6);
+                    GlStateManager.translatef(shouldSpreadItems() ? f7 : 0, shouldSpreadItems() ? f9 : 0, f6);
                 }
 
                 GlStateManager.pushMatrix();
@@ -123,7 +122,7 @@ public class RenderCustomEntityItem extends RenderEntityItem
                 {
                     GlStateManager.pushMatrix();
                     IBakedModel transformedModel = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(ibakedmodel, ItemCameraTransforms.TransformType.GROUND, false);
-                    this.renderItem.renderItem(itemstack, transformedModel);
+                    this.itemRenderer.renderItem(itemstack, transformedModel);
                     GlStateManager.popMatrix();
 
                     GlStateManager.pushMatrix();
@@ -141,13 +140,13 @@ public class RenderCustomEntityItem extends RenderEntityItem
                 {
                     float f8 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F * 0.5F;
                     float f10 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F * 0.5F;
-                    GlStateManager.translate(f8, f10, 0.0F);
+                    GlStateManager.translatef(f8, f10, 0.0F);
                 }
 
                 IBakedModel transformedModel = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(ibakedmodel, ItemCameraTransforms.TransformType.GROUND, false);
-                this.renderItem.renderItem(itemstack, transformedModel);
+                this.itemRenderer.renderItem(itemstack, transformedModel);
                 GlStateManager.popMatrix();
-                GlStateManager.translate(0.0F, 0.0F, 0.09375F);
+                GlStateManager.translatef(0.0F, 0.0F, 0.09375F);
             }
         }
 
@@ -164,7 +163,7 @@ public class RenderCustomEntityItem extends RenderEntityItem
 
         if (flag)
         {
-            this.renderManager.renderEngine.getTexture(this.getEntityTexture(entity)).restoreLastBlurMipmap();
+            this.renderManager.textureManager.getTexture(this.getEntityTexture(entity)).restoreLastBlurMipmap();
         }
     }
 }

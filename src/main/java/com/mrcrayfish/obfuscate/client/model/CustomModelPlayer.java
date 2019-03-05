@@ -2,8 +2,8 @@ package com.mrcrayfish.obfuscate.client.model;
 
 import com.mrcrayfish.obfuscate.client.event.ModelPlayerEvent;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ModelPlayer;
-import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.renderer.entity.model.ModelPlayer;
+import net.minecraft.client.renderer.entity.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
@@ -25,10 +25,10 @@ public class CustomModelPlayer extends ModelPlayer
     public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn)
     {
         this.resetRotationAngles();
-        if(!MinecraftForge.EVENT_BUS.post(new ModelPlayerEvent.SetupAngles.Pre((EntityPlayer) entityIn, this, Minecraft.getMinecraft().getRenderPartialTicks())))
+        if(!MinecraftForge.EVENT_BUS.post(new ModelPlayerEvent.SetupAngles.Pre((EntityPlayer) entityIn, this, Minecraft.getInstance().getRenderPartialTicks())))
         {
             super.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entityIn);
-            MinecraftForge.EVENT_BUS.post(new ModelPlayerEvent.SetupAngles.Post((EntityPlayer) entityIn, this, Minecraft.getMinecraft().getRenderPartialTicks()));
+            MinecraftForge.EVENT_BUS.post(new ModelPlayerEvent.SetupAngles.Post((EntityPlayer) entityIn, this, Minecraft.getInstance().getRenderPartialTicks()));
         }
         this.setupRotationAngles();
     }
@@ -37,10 +37,10 @@ public class CustomModelPlayer extends ModelPlayer
     public void render(Entity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale)
     {
         this.resetVisibilities();
-        if(!MinecraftForge.EVENT_BUS.post(new ModelPlayerEvent.Render.Pre((EntityPlayer) entityIn, this, Minecraft.getMinecraft().getRenderPartialTicks())))
+        if(!MinecraftForge.EVENT_BUS.post(new ModelPlayerEvent.Render.Pre((EntityPlayer) entityIn, this, Minecraft.getInstance().getRenderPartialTicks())))
         {
             super.render(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
-            MinecraftForge.EVENT_BUS.post(new ModelPlayerEvent.Render.Post((EntityPlayer) entityIn, this, Minecraft.getMinecraft().getRenderPartialTicks()));
+            MinecraftForge.EVENT_BUS.post(new ModelPlayerEvent.Render.Post((EntityPlayer) entityIn, this, Minecraft.getInstance().getRenderPartialTicks()));
         }
     }
 
