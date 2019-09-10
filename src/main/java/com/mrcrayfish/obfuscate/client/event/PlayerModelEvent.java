@@ -1,26 +1,26 @@
 package com.mrcrayfish.obfuscate.client.event;
 
-import net.minecraft.client.renderer.entity.model.ModelPlayer;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.renderer.entity.model.PlayerModel;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
 
 /**
  * Author: MrCrayfish
  */
-public abstract class ModelPlayerEvent extends PlayerEvent
+public abstract class PlayerModelEvent extends PlayerEvent
 {
-    private ModelPlayer modelPlayer;
+    private PlayerModel modelPlayer;
     private float partialTicks;
 
-    private ModelPlayerEvent(EntityPlayer player, ModelPlayer modelPlayer, float partialTicks)
+    private PlayerModelEvent(PlayerEntity player, PlayerModel modelPlayer, float partialTicks)
     {
         super(player);
         this.modelPlayer = modelPlayer;
         this.partialTicks = partialTicks;
     }
 
-    public ModelPlayer getModelPlayer()
+    public PlayerModel getModelPlayer()
     {
         return modelPlayer;
     }
@@ -31,16 +31,16 @@ public abstract class ModelPlayerEvent extends PlayerEvent
     }
 
     @Cancelable
-    public static class SetupAngles extends ModelPlayerEvent
+    public static class SetupAngles extends PlayerModelEvent
     {
-        private SetupAngles(EntityPlayer player, ModelPlayer modelPlayer, float partialTicks)
+        private SetupAngles(PlayerEntity player, PlayerModel modelPlayer, float partialTicks)
         {
             super(player, modelPlayer, partialTicks);
         }
 
         public static class Pre extends SetupAngles
         {
-            public Pre(EntityPlayer player, ModelPlayer modelPlayer, float partialTicks)
+            public Pre(PlayerEntity player, PlayerModel modelPlayer, float partialTicks)
             {
                 super(player, modelPlayer, partialTicks);
             }
@@ -48,7 +48,7 @@ public abstract class ModelPlayerEvent extends PlayerEvent
 
         public static class Post extends SetupAngles
         {
-            public Post(EntityPlayer player, ModelPlayer modelPlayer, float partialTicks)
+            public Post(PlayerEntity player, PlayerModel modelPlayer, float partialTicks)
             {
                 super(player, modelPlayer, partialTicks);
             }
@@ -62,16 +62,16 @@ public abstract class ModelPlayerEvent extends PlayerEvent
     }
 
     @Cancelable
-    public static class Render extends ModelPlayerEvent
+    public static class Render extends PlayerModelEvent
     {
-        private Render(EntityPlayer player, ModelPlayer modelPlayer, float partialTicks)
+        private Render(PlayerEntity player, PlayerModel modelPlayer, float partialTicks)
         {
             super(player, modelPlayer, partialTicks);
         }
 
         public static class Pre extends Render
         {
-            public Pre(EntityPlayer player, ModelPlayer modelPlayer, float partialTicks)
+            public Pre(PlayerEntity player, PlayerModel modelPlayer, float partialTicks)
             {
                 super(player, modelPlayer, partialTicks);
             }
@@ -79,7 +79,7 @@ public abstract class ModelPlayerEvent extends PlayerEvent
 
         public static class Post extends Render
         {
-            public Post(EntityPlayer player, ModelPlayer modelPlayer, float partialTicks)
+            public Post(PlayerEntity player, PlayerModel modelPlayer, float partialTicks)
             {
                 super(player, modelPlayer, partialTicks);
             }

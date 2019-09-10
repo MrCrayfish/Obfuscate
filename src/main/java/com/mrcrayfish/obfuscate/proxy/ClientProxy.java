@@ -1,9 +1,8 @@
 package com.mrcrayfish.obfuscate.proxy;
 
-import com.mrcrayfish.obfuscate.Obfuscate;
-import com.mrcrayfish.obfuscate.client.renderer.entity.RenderCustomEntityItem;
+import com.mrcrayfish.obfuscate.client.renderer.entity.CustomItemRenderer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 
 /**
@@ -12,8 +11,8 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 public class ClientProxy extends CommonProxy
 {
     @Override
-    public void preInit()
+    public void setupClient()
     {
-        RenderingRegistry.registerEntityRenderingHandler(EntityItem.class, manager -> new RenderCustomEntityItem(manager, Minecraft.getInstance().getItemRenderer()));
+        RenderingRegistry.registerEntityRenderingHandler(ItemEntity.class, manager -> new CustomItemRenderer(manager, Minecraft.getInstance().getItemRenderer()));
     }
 }

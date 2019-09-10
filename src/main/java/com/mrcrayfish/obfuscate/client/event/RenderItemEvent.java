@@ -1,10 +1,10 @@
 package com.mrcrayfish.obfuscate.client.event;
 
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHandSide;
+import net.minecraft.util.HandSide;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
 
@@ -42,29 +42,29 @@ public class RenderItemEvent extends Event
     @Cancelable
     public static class Held extends RenderItemEvent
     {
-        private EntityLivingBase entity;
-        private EnumHandSide handSide;
+        private LivingEntity entity;
+        private HandSide handSide;
 
-        public Held(EntityLivingBase entity, ItemStack heldItem, ItemCameraTransforms.TransformType transformType, EnumHandSide handSide, float partialTicks)
+        public Held(LivingEntity entity, ItemStack heldItem, ItemCameraTransforms.TransformType transformType, HandSide handSide, float partialTicks)
         {
             super(heldItem, transformType, partialTicks);
             this.entity = entity;
             this.handSide = handSide;
         }
 
-        public EntityLivingBase getEntity()
+        public LivingEntity getEntity()
         {
             return entity;
         }
 
-        public EnumHandSide getHandSide()
+        public HandSide getHandSide()
         {
             return handSide;
         }
 
         public static class Pre extends Held
         {
-            public Pre(EntityLivingBase entity, ItemStack heldItem, ItemCameraTransforms.TransformType transformType, EnumHandSide handSide, float partialTicks)
+            public Pre(LivingEntity entity, ItemStack heldItem, ItemCameraTransforms.TransformType transformType, HandSide handSide, float partialTicks)
             {
                 super(entity, heldItem, transformType, handSide, partialTicks);
             }
@@ -72,7 +72,7 @@ public class RenderItemEvent extends Event
 
         public static class Post extends Held
         {
-            public Post(EntityLivingBase entity, ItemStack heldItem, ItemCameraTransforms.TransformType transformType, EnumHandSide handSide, float partialTicks)
+            public Post(LivingEntity entity, ItemStack heldItem, ItemCameraTransforms.TransformType transformType, HandSide handSide, float partialTicks)
             {
                 super(entity, heldItem, transformType, handSide, partialTicks);
             }
@@ -82,30 +82,28 @@ public class RenderItemEvent extends Event
             {
                 return false;
             }
-
-
         }
     }
 
     @Cancelable
     public static class Entity extends RenderItemEvent
     {
-        private EntityItem entity;
+        private ItemEntity entity;
 
-        public Entity(EntityItem entity, ItemStack heldItem, float partialTicks)
+        public Entity(ItemEntity entity, ItemStack heldItem, float partialTicks)
         {
             super(heldItem, ItemCameraTransforms.TransformType.GROUND, partialTicks);
             this.entity = entity;
         }
 
-        public EntityItem getEntity()
+        public ItemEntity getEntity()
         {
             return entity;
         }
 
         public static class Pre extends Entity
         {
-            public Pre(EntityItem entity, ItemStack heldItem, float partialTicks)
+            public Pre(ItemEntity entity, ItemStack heldItem, float partialTicks)
             {
                 super(entity, heldItem, partialTicks);
             }
@@ -113,7 +111,7 @@ public class RenderItemEvent extends Event
 
         public static class Post extends Entity
         {
-            public Post(EntityItem entity, ItemStack heldItem, float partialTicks)
+            public Post(ItemEntity entity, ItemStack heldItem, float partialTicks)
             {
                 super(entity, heldItem, partialTicks);
             }

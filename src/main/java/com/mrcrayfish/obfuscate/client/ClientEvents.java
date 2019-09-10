@@ -1,18 +1,18 @@
 package com.mrcrayfish.obfuscate.client;
 
-import com.mrcrayfish.obfuscate.Obfuscate;
 import com.mrcrayfish.obfuscate.Reference;
-import com.mrcrayfish.obfuscate.client.model.CustomModelPlayer;
-import com.mrcrayfish.obfuscate.client.model.ModelBipedArmor;
-import com.mrcrayfish.obfuscate.client.model.layer.LayerCustomHeldItem;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderLivingBase;
-import net.minecraft.client.renderer.entity.RenderPlayer;
-import net.minecraft.client.renderer.entity.layers.*;
-import net.minecraft.client.renderer.entity.model.ModelBiped;
-import net.minecraft.entity.EntityLivingBase;
+import com.mrcrayfish.obfuscate.client.model.CustomBipedModel;
+import com.mrcrayfish.obfuscate.client.model.CustomPlayerModel;
+import com.mrcrayfish.obfuscate.client.model.layer.CustomHeldItemLayer;
+import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
+import net.minecraft.client.renderer.entity.LivingRenderer;
+import net.minecraft.client.renderer.entity.PlayerRenderer;
+import net.minecraft.client.renderer.entity.layers.BipedArmorLayer;
+import net.minecraft.client.renderer.entity.layers.HeadLayer;
+import net.minecraft.client.renderer.entity.layers.HeldItemLayer;
+import net.minecraft.client.renderer.entity.layers.LayerRenderer;
+import net.minecraft.client.renderer.entity.model.BipedModel;
+import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderPlayerEvent;
@@ -37,37 +37,25 @@ public class ClientEvents
     {
         if(!setupPlayerRender)
         {
-            Render render = Minecraft.getInstance().getRenderManager().getEntityClassRenderObject(AbstractClientPlayer.class);
-            Map<String, RenderPlayer> skinMap = render.getRenderManager().getSkinMap();
+            PlayerRenderer render = event.getRenderer();
+            Map<String, PlayerRenderer> skinMap = render.getRenderManager().getSkinMap();
             patchPlayerRender(skinMap.get("default"), false);
             patchPlayerRender(skinMap.get("slim"), true);
             setupPlayerRender = true;
         }
     }
 
-    private static void patchPlayerRender(RenderPlayer player, boolean smallArms)
+    private static void patchPlayerRender(PlayerRenderer player, boolean smallArms)
     {
-        ModelBiped model = new CustomModelPlayer(0.0F, smallArms);
-        List<LayerRenderer<EntityLivingBase>> layers = ObfuscationReflectionHelper.getPrivateValue(RenderLivingBase.class, player, "field_177097_h");
+        PlayerModel<AbstractClientPlayerEntity> model = new CustomPlayerModel(0.0F, smallArms);
+        List<LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>> layers = ObfuscationReflectionHelper.getPrivateValue(LivingRenderer.class, player, "field_177097_h");
         if(layers != null)
         {
-            layers.removeIf(layerRenderer -> layerRenderer instanceof LayerHeldItem || layerRenderer instanceof LayerCustomHead);
-            layers.add(new LayerCustomHeldItem(player));
-            layers.add(new LayerCustomHead(model.bipedHead));
-            layers.forEach(layerRenderer ->
-            {
-                if(layerRenderer instanceof LayerBipedArmor)
-                {
-                    patchArmor((LayerBipedArmor) layerRenderer, model);
-                }
-            });
+            layers.removeIf(layer -> layer instanceof HeldItemLayer || layer instanceof HeadLayer || layer instanceof BipedArmorLayer);
+            layers.add(new CustomHeldItemLayer(player));
+            layers.add(new HeadLayer<>(player));
+            layers.add(new BipedArmorLayer<>(player, new CustomBipedModel(model, 0.5F), new CustomBipedModel(model, 1.0F)));
         }
-        ObfuscationReflectionHelper.setPrivateValue(RenderLivingBase.class, player, model, "field_77045_g");
-    }
-
-    private static void patchArmor(LayerBipedArmor layerBipedArmor, ModelBiped source)
-    {
-        ObfuscationReflectionHelper.setPrivateValue(LayerArmorBase.class, layerBipedArmor, new ModelBipedArmor(source, 1.0F), "field_177186_d");
-        ObfuscationReflectionHelper.setPrivateValue(LayerArmorBase.class, layerBipedArmor, new ModelBipedArmor(source, 0.5F), "field_177189_c");
+        ObfuscationReflectionHelper.setPrivateValue(LivingRenderer.class, player, model, "field_77045_g");
     }
 }

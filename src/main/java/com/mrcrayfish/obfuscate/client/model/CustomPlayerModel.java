@@ -1,57 +1,56 @@
 package com.mrcrayfish.obfuscate.client.model;
 
-import com.mrcrayfish.obfuscate.client.event.ModelPlayerEvent;
+import com.mrcrayfish.obfuscate.client.event.PlayerModelEvent;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.model.ModelPlayer;
-import net.minecraft.client.renderer.entity.model.ModelRenderer;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
+import net.minecraft.client.renderer.entity.model.PlayerModel;
+import net.minecraft.client.renderer.entity.model.RendererModel;
 import net.minecraftforge.common.MinecraftForge;
 
 /**
  * Author: MrCrayfish
  */
-public class CustomModelPlayer extends ModelPlayer
+public class CustomPlayerModel extends PlayerModel<AbstractClientPlayerEntity>
 {
     private boolean smallArms;
 
-    public CustomModelPlayer(float modelSize, boolean smallArmsIn)
+    public CustomPlayerModel(float modelSize, boolean smallArmsIn)
     {
         super(modelSize, smallArmsIn);
         this.smallArms = smallArmsIn;
     }
 
     @Override
-    public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn)
+    public void setRotationAngles(AbstractClientPlayerEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor)
     {
         this.resetRotationAngles();
-        if(!MinecraftForge.EVENT_BUS.post(new ModelPlayerEvent.SetupAngles.Pre((EntityPlayer) entityIn, this, Minecraft.getInstance().getRenderPartialTicks())))
+        if(!MinecraftForge.EVENT_BUS.post(new PlayerModelEvent.SetupAngles.Pre(entityIn, this, Minecraft.getInstance().getRenderPartialTicks())))
         {
-            super.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entityIn);
-            MinecraftForge.EVENT_BUS.post(new ModelPlayerEvent.SetupAngles.Post((EntityPlayer) entityIn, this, Minecraft.getInstance().getRenderPartialTicks()));
+            super.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor);
+            MinecraftForge.EVENT_BUS.post(new PlayerModelEvent.SetupAngles.Post(entityIn, this, Minecraft.getInstance().getRenderPartialTicks()));
         }
         this.setupRotationAngles();
     }
 
     @Override
-    public void render(Entity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale)
+    public void render(AbstractClientPlayerEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale)
     {
         this.resetVisibilities();
-        if(!MinecraftForge.EVENT_BUS.post(new ModelPlayerEvent.Render.Pre((EntityPlayer) entityIn, this, Minecraft.getInstance().getRenderPartialTicks())))
+        if(!MinecraftForge.EVENT_BUS.post(new PlayerModelEvent.Render.Pre(entityIn, this, Minecraft.getInstance().getRenderPartialTicks())))
         {
             super.render(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
-            MinecraftForge.EVENT_BUS.post(new ModelPlayerEvent.Render.Post((EntityPlayer) entityIn, this, Minecraft.getInstance().getRenderPartialTicks()));
+            MinecraftForge.EVENT_BUS.post(new PlayerModelEvent.Render.Post(entityIn, this, Minecraft.getInstance().getRenderPartialTicks()));
         }
     }
 
     private void setupRotationAngles()
     {
-        copyModelAngles(bipedRightArm, bipedRightArmwear);
-        copyModelAngles(bipedLeftArm, bipedLeftArmwear);
-        copyModelAngles(bipedRightLeg, bipedRightLegwear);
-        copyModelAngles(bipedLeftLeg, bipedLeftLegwear);
-        copyModelAngles(bipedBody, bipedBodyWear);
-        copyModelAngles(bipedHead, bipedHeadwear);
+        bipedRightArmwear.copyModelAngles(bipedRightArm);
+        bipedLeftArmwear.copyModelAngles(bipedLeftArm);
+        bipedRightLegwear.copyModelAngles(bipedRightLeg);
+        bipedLeftLegwear.copyModelAngles(bipedLeftLeg);
+        bipedBodyWear.copyModelAngles(bipedBody);
+        bipedHeadwear.copyModelAngles(bipedHead);
     }
 
     private void resetRotationAngles()
@@ -87,7 +86,7 @@ public class CustomModelPlayer extends ModelPlayer
         bipedLeftLeg.rotationPointZ = 0.0F;
 
         this.resetAll(bipedLeftLegwear);
-        copyModelAngles(bipedLeftLeg, bipedLeftLegwear);
+        bipedLeftLegwear.copyModelAngles(bipedLeftLeg);
 
         this.resetAll(bipedRightLeg);
         bipedRightLeg.rotationPointX = -1.9F;
@@ -95,10 +94,10 @@ public class CustomModelPlayer extends ModelPlayer
         bipedRightLeg.rotationPointZ = 0.0F;
 
         this.resetAll(bipedRightLegwear);
-        copyModelAngles(bipedRightLeg, bipedRightLegwear);
+        bipedRightLegwear.copyModelAngles(bipedRightLeg);
     }
 
-    private void resetAll(ModelRenderer renderer)
+    private void resetAll(RendererModel renderer)
     {
         renderer.offsetX = 0.0F;
         renderer.offsetY = 0.0F;

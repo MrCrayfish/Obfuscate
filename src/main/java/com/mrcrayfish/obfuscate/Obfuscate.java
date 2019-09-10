@@ -21,11 +21,11 @@ public class Obfuscate
 
     public Obfuscate()
     {
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::preInit);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
     }
 
-    private void preInit(FMLClientSetupEvent event)
+    private void setupClient(FMLClientSetupEvent event)
     {
-        PROXY.preInit();
+        PROXY.setupClient();
     }
 }
