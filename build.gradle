@@ -92,12 +92,12 @@ import net.minecraftforge.gradle.common.task.SignJar
 
 task signJar(type: SignJar, dependsOn: jar) {
     onlyIf {
-        keyStoreProperties.hasProperty('keyStore')
+        keyStoreProperties.containsKey('keyStore')
     }
-    keyStore = keyStoreProperties.getProperty('keyStore')
     alias = keyStoreProperties.getProperty('alias')
-    storePass = keyStoreProperties.getProperty('keyPass')
-    keyPass = keyStoreProperties.getProperty('storePass')
+    storePass = keyStoreProperties.getProperty('storePass')
+    keyPass = keyStoreProperties.getProperty('keyPass')
+    keyStore = keyStoreProperties.getProperty('keyStore')
     inputFile = jar.archivePath
     outputFile = jar.archivePath
 }
