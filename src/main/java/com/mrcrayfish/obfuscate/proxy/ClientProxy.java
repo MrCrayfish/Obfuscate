@@ -51,7 +51,7 @@ public class ClientProxy extends CommonProxy
             layers.removeIf(layer -> layer instanceof HeldItemLayer || layer instanceof HeadLayer || layer instanceof BipedArmorLayer);
             layers.add(new CustomHeldItemLayer(player));
             layers.add(new HeadLayer<>(player));
-            layers.add(new BipedArmorLayer<>(player, new CustomBipedModel(model, 0.5F), new CustomBipedModel(model, 1.0F)));
+            layers.add(new BipedArmorLayer<>(player, new CustomBipedModel<>(model, 0.5F), new CustomBipedModel<>(model, 1.0F)));
         }
         ObfuscationReflectionHelper.setPrivateValue(LivingRenderer.class, player, model, "field_77045_g");
 
