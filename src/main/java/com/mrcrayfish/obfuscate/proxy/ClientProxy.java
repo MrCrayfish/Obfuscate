@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.entity.layers.HeadLayer;
 import net.minecraft.client.renderer.entity.layers.HeldItemLayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
@@ -29,7 +30,7 @@ public class ClientProxy extends CommonProxy
     @Override
     public void setupClient()
     {
-        RenderingRegistry.registerEntityRenderingHandler(ItemEntity.class, manager -> new CustomItemRenderer(manager, Minecraft.getInstance().getItemRenderer()));
+        RenderingRegistry.registerEntityRenderingHandler(EntityType.ITEM, manager -> new CustomItemRenderer(manager, Minecraft.getInstance().getItemRenderer()));
         this.patchPlayerModels();
     }
 
@@ -49,7 +50,7 @@ public class ClientProxy extends CommonProxy
         if(layers != null)
         {
             layers.removeIf(layer -> layer instanceof HeldItemLayer || layer instanceof HeadLayer || layer instanceof BipedArmorLayer);
-            layers.add(new CustomHeldItemLayer(player));
+            layers.add(new CustomHeldItemLayer<>(player));
             layers.add(new HeadLayer<>(player));
             layers.add(new BipedArmorLayer<>(player, new CustomBipedModel<>(model, 0.5F), new CustomBipedModel<>(model, 1.0F)));
         }

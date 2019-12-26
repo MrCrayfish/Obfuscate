@@ -12,7 +12,7 @@ apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 // apply plugin: 'eclipse'
 
-version = '0.3.3-1.14.4'
+version = '0.3.3-1.15.1'
 group = 'com.mrcrayfish' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'obfuscate'
 
@@ -59,8 +59,7 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.4-28.0.83'
-
+    minecraft 'net.minecraftforge:forge:1.15.1-30.0.15'
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

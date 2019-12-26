@@ -1,12 +1,14 @@
 package com.mrcrayfish.obfuscate.client.renderer.entity;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mrcrayfish.obfuscate.client.event.RenderItemEvent;
-import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -32,130 +34,64 @@ public class CustomItemRenderer extends ItemRenderer
         this.itemRenderer = renderer;
     }
 
-    private int transformModelCount(ItemEntity entity, double x, double y, double z, float partialTicks, IBakedModel model)
-    {
-        ItemStack stack = entity.getItem();
-        if(stack.isEmpty())
-        {
-            return 0;
-        }
-
-        float f1 = shouldBob() ? MathHelper.sin(((float) entity.getAge() + partialTicks) / 10.0F + entity.hoverStart) * 0.1F + 0.1F : 0;
-        float f2 = model.getItemCameraTransforms().getTransform(ItemCameraTransforms.TransformType.GROUND).scale.getY();
-        GlStateManager.translatef((float) x, (float) y + f1 + 0.25F * f2, (float) z);
-
-        if(model.isGui3d() || this.renderManager.options != null)
-        {
-            float f3 = (((float) entity.getAge() + partialTicks) / 20.0F + entity.hoverStart) * (180F / (float) Math.PI);
-            GlStateManager.rotatef(f3, 0.0F, 1.0F, 0.0F);
-        }
-
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        return this.getModelCount(stack);
-    }
-
     @Override
-    public void doRender(ItemEntity entity, double x, double y, double z, float entityYaw, float partialTicks)
+    public void func_225623_a_(ItemEntity entity, float p_225623_2_, float partialTicks, MatrixStack matrix, IRenderTypeBuffer buffer, int p_225623_6_)
     {
-        ItemStack itemstack = entity.getItem();
-        int i = itemstack.isEmpty() ? 187 : Item.getIdFromItem(itemstack.getItem()) + itemstack.getDamage();
-        this.random.setSeed((long) i);
-        boolean flag = false;
-
-        if(this.bindEntityTexture(entity))
+        matrix.func_227860_a_();
+        ItemStack stack = entity.getItem();
+        int seed = stack.isEmpty() ? 187 : Item.getIdFromItem(stack.getItem()) + stack.getDamage();
+        this.random.setSeed((long) seed);
+        IBakedModel model = this.itemRenderer.getItemModelWithOverrides(stack, entity.world, null);
+        boolean isGui3d = model.isGui3d();
+        int modelCount = this.getModelCount(stack);
+        float bobOffset = shouldBob() ? MathHelper.sin(((float) entity.getAge() + partialTicks) / 10.0F + entity.hoverStart) * 0.1F + 0.1F : 0;
+        float yScale = model.getItemCameraTransforms().getTransform(ItemCameraTransforms.TransformType.GROUND).scale.getY();
+        matrix.func_227861_a_(0.0D, (double) (bobOffset + 0.25F * yScale), 0.0D);
+        float rotation = ((float) entity.getAge() + partialTicks) / 20.0F + entity.hoverStart;
+        matrix.func_227863_a_(Vector3f.field_229181_d_.func_229193_c_(rotation));
+        if(!isGui3d)
         {
-            this.renderManager.textureManager.getTexture(this.getEntityTexture(entity)).setBlurMipmap(false, false);
-            flag = true;
+            float x = -0.0F * (float) (modelCount - 1) * 0.5F;
+            float y = -0.0F * (float) (modelCount - 1) * 0.5F;
+            float z = -0.09375F * (float) (modelCount - 1) * 0.5F;
+            matrix.func_227861_a_((double) x, (double) y, (double) z);
         }
 
-        GlStateManager.enableRescaleNormal();
-        GlStateManager.alphaFunc(516, 0.1F);
-        GlStateManager.enableBlend();
-        RenderHelper.enableStandardItemLighting();
-        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        GlStateManager.pushMatrix();
-        IBakedModel ibakedmodel = this.itemRenderer.getItemModelWithOverrides(itemstack, entity.world, null);
-        int j = this.transformModelCount(entity, x, y, z, partialTicks, ibakedmodel);
-        boolean flag1 = ibakedmodel.isGui3d();
-
-        if(!flag1)
+        for(int m = 0; m < modelCount; m++)
         {
-            float f3 = -0.0F * (float) (j - 1) * 0.5F;
-            float f4 = -0.0F * (float) (j - 1) * 0.5F;
-            float f5 = -0.09375F * (float) (j - 1) * 0.5F;
-            GlStateManager.translatef(f3, f4, f5);
-        }
-
-        if(this.renderOutlines)
-        {
-            GlStateManager.enableColorMaterial();
-            GlStateManager.setupSolidRenderingTextureCombine(this.getTeamColor(entity));
-        }
-
-        for(int k = 0; k < j; ++k)
-        {
-            if(flag1)
+            matrix.func_227860_a_(); //push
+            if(m > 0)
             {
-                GlStateManager.pushMatrix();
-
-                if(k > 0)
+                if(isGui3d)
                 {
-                    float f7 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
-                    float f9 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
-                    float f6 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
-                    GlStateManager.translatef(shouldSpreadItems() ? f7 : 0, shouldSpreadItems() ? f9 : 0, f6);
+                    float x = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
+                    float y = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
+                    float z = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
+                    matrix.func_227861_a_(shouldSpreadItems() ? x : 0, shouldSpreadItems() ? y : 0, shouldSpreadItems() ? z : 0);
                 }
-
-                GlStateManager.pushMatrix();
-                boolean cancelled = MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Pre(entity, itemstack, partialTicks));
-                GlStateManager.popMatrix();
-
-                if(!cancelled)
+                else
                 {
-                    GlStateManager.pushMatrix();
-                    IBakedModel transformedModel = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(ibakedmodel, ItemCameraTransforms.TransformType.GROUND, false);
-                    this.itemRenderer.renderItem(itemstack, transformedModel);
-                    GlStateManager.popMatrix();
-
-                    GlStateManager.pushMatrix();
-                    MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Post(entity, itemstack, partialTicks));
-                    GlStateManager.popMatrix();
+                    float x = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F * 0.5F;
+                    float y = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F * 0.5F;
+                    matrix.func_227861_a_(shouldSpreadItems() ? x : 0, shouldSpreadItems() ? y : 0, 0.0D);
                 }
-
-                GlStateManager.popMatrix();
             }
-            else
+
+            boolean cancelled = MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Pre(entity, stack, matrix, buffer, partialTicks));
+            if(!cancelled)
             {
-                GlStateManager.pushMatrix();
+                this.itemRenderer.func_229111_a_(stack, ItemCameraTransforms.TransformType.GROUND, false, matrix, buffer, p_225623_6_, OverlayTexture.field_229196_a_, model);
+                MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Post(entity, stack, matrix, buffer, partialTicks));
+            }
+            matrix.func_227865_b_(); //pop
 
-                if(k > 0)
-                {
-                    float f8 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F * 0.5F;
-                    float f10 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F * 0.5F;
-                    GlStateManager.translatef(f8, f10, 0.0F);
-                }
-
-                IBakedModel transformedModel = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(ibakedmodel, ItemCameraTransforms.TransformType.GROUND, false);
-                this.itemRenderer.renderItem(itemstack, transformedModel);
-                GlStateManager.popMatrix();
-                GlStateManager.translatef(0.0F, 0.0F, 0.09375F);
+            if(!isGui3d)
+            {
+                matrix.func_227861_a_(0.0, 0.0, 0.09375F);
             }
         }
 
-        if(this.renderOutlines)
-        {
-            GlStateManager.tearDownSolidRenderingTextureCombine();
-            GlStateManager.disableColorMaterial();
-        }
-
-        GlStateManager.popMatrix();
-        GlStateManager.disableRescaleNormal();
-        GlStateManager.disableBlend();
-        this.bindEntityTexture(entity);
-
-        if(flag)
-        {
-            this.renderManager.textureManager.getTexture(this.getEntityTexture(entity)).restoreLastBlurMipmap();
-        }
+        matrix.func_227865_b_();
+        super.func_225623_a_(entity, p_225623_2_, partialTicks, matrix, buffer, p_225623_6_);
     }
 }
