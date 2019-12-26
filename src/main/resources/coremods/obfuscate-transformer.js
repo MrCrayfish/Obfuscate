@@ -113,7 +113,12 @@ function patch_LivingRenderer_func_225623_a_(method) {
         method.instructions.insertBefore(startNode, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/entity/LivingRenderer", ASMAPI.mapField("field_77045_g"), "Lnet/minecraft/client/renderer/entity/model/EntityModel;"))
         method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ALOAD, 4));
         method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ALOAD, 5));
-        method.instructions.insertBefore(startNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/obfuscate/client/Hooks", "fireRenderPlayerPre", "(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/model/EntityModel;Lcom/mojang/blaze3d/matrix/MatrixStack;Lcom/mojang/blaze3d/vertex/IVertexBuilder;)Z", false));
+        method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.FLOAD, 14));
+        method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.FLOAD, 13));
+        method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.FLOAD, 12));
+        method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.FLOAD, 10));
+        method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.FLOAD, 11));
+        method.instructions.insertBefore(startNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/obfuscate/client/Hooks", "fireRenderPlayerPre", "(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/model/EntityModel;Lcom/mojang/blaze3d/matrix/MatrixStack;Lcom/mojang/blaze3d/vertex/IVertexBuilder;FFFFF)Z", false));
         method.instructions.insertBefore(startNode, new JumpInsnNode(Opcodes.IFNE, endNode));
 
         method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.ALOAD, 1));
@@ -121,7 +126,12 @@ function patch_LivingRenderer_func_225623_a_(method) {
         method.instructions.insertBefore(endNode, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/entity/LivingRenderer", ASMAPI.mapField("field_77045_g"), "Lnet/minecraft/client/renderer/entity/model/EntityModel;"))
         method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.ALOAD, 4));
         method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.ALOAD, 5));
-        method.instructions.insertBefore(endNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/obfuscate/client/Hooks", "fireRenderPlayerPost", "(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/model/EntityModel;Lcom/mojang/blaze3d/matrix/MatrixStack;Lcom/mojang/blaze3d/vertex/IVertexBuilder;)V", false));
+        method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.FLOAD, 14));
+        method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.FLOAD, 13));
+        method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.FLOAD, 12));
+        method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.FLOAD, 10));
+        method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.FLOAD, 11));
+        method.instructions.insertBefore(endNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/obfuscate/client/Hooks", "fireRenderPlayerPost", "(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/model/EntityModel;Lcom/mojang/blaze3d/matrix/MatrixStack;Lcom/mojang/blaze3d/vertex/IVertexBuilder;FFFFF)V", false));
 
         print("[obfuscate] Successfully patched LivingRenderer#func_225623_a_");
         return;

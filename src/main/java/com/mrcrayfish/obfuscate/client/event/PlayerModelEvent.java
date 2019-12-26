@@ -14,17 +14,52 @@ public abstract class PlayerModelEvent extends PlayerEvent
 {
     private PlayerModel modelPlayer;
     private float partialTicks;
+    private float limbSwing;
+    private float limbSwingAmount;
+    private float ageInTicks;
+    private float netHeadYaw;
+    private float headPitch;
 
-    private PlayerModelEvent(PlayerEntity player, PlayerModel modelPlayer, float partialTicks)
+    private PlayerModelEvent(PlayerEntity player, PlayerModel modelPlayer, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float partialTicks)
     {
         super(player);
         this.modelPlayer = modelPlayer;
+        this.limbSwing = limbSwing;
+        this.limbSwingAmount = limbSwingAmount;
+        this.ageInTicks = ageInTicks;
+        this.netHeadYaw = netHeadYaw;
+        this.headPitch = headPitch;
         this.partialTicks = partialTicks;
     }
 
     public PlayerModel getModelPlayer()
     {
         return modelPlayer;
+    }
+
+    public float getLimbSwing()
+    {
+        return limbSwing;
+    }
+
+    public float getLimbSwingAmount()
+    {
+        return limbSwingAmount;
+    }
+
+    public float getAgeInTicks()
+    {
+        return ageInTicks;
+    }
+
+    public float getNetHeadYaw()
+    {
+        return netHeadYaw;
+    }
+
+    public float getHeadPitch()
+    {
+        return headPitch;
     }
 
     public float getPartialTicks()
@@ -35,45 +70,9 @@ public abstract class PlayerModelEvent extends PlayerEvent
     @Cancelable
     public static class SetupAngles extends PlayerModelEvent
     {
-        private float limbSwing;
-        private float limbSwingAmount;
-        private float ageInTicks;
-        private float netHeadYaw;
-        private float headPitch;
-
         private SetupAngles(PlayerEntity player, PlayerModel modelPlayer, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float partialTicks)
         {
-            super(player, modelPlayer, partialTicks);
-            this.limbSwing = limbSwing;
-            this.limbSwingAmount = limbSwingAmount;
-            this.ageInTicks = ageInTicks;
-            this.netHeadYaw = netHeadYaw;
-            this.headPitch = headPitch;
-        }
-
-        public float getLimbSwing()
-        {
-            return limbSwing;
-        }
-
-        public float getLimbSwingAmount()
-        {
-            return limbSwingAmount;
-        }
-
-        public float getAgeInTicks()
-        {
-            return ageInTicks;
-        }
-
-        public float getNetHeadYaw()
-        {
-            return netHeadYaw;
-        }
-
-        public float getHeadPitch()
-        {
-            return headPitch;
+            super(player, modelPlayer, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, partialTicks);
         }
 
         public static class Pre extends SetupAngles
@@ -105,26 +104,26 @@ public abstract class PlayerModelEvent extends PlayerEvent
         private MatrixStack matrixStack;
         private IVertexBuilder builder;
 
-        private Render(PlayerEntity player, PlayerModel modelPlayer, MatrixStack matrixStack, IVertexBuilder builder, float partialTicks)
+        private Render(PlayerEntity player, PlayerModel modelPlayer, MatrixStack matrixStack, IVertexBuilder builder, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float partialTicks)
         {
-            super(player, modelPlayer, partialTicks);
+            super(player, modelPlayer, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, partialTicks);
             this.matrixStack = matrixStack;
             this.builder = builder;
         }
 
         public static class Pre extends Render
         {
-            public Pre(PlayerEntity player, PlayerModel modelPlayer, MatrixStack matrixStack, IVertexBuilder builder, float partialTicks)
+            public Pre(PlayerEntity player, PlayerModel modelPlayer, MatrixStack matrixStack, IVertexBuilder builder, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float partialTicks)
             {
-                super(player, modelPlayer, matrixStack, builder, partialTicks);
+                super(player, modelPlayer, matrixStack, builder, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, partialTicks);
             }
         }
 
         public static class Post extends Render
         {
-            public Post(PlayerEntity player, PlayerModel modelPlayer, MatrixStack matrixStack, IVertexBuilder builder, float partialTicks)
+            public Post(PlayerEntity player, PlayerModel modelPlayer, MatrixStack matrixStack, IVertexBuilder builder, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float partialTicks)
             {
-                super(player, modelPlayer, matrixStack, builder, partialTicks);
+                super(player, modelPlayer, matrixStack, builder, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, partialTicks);
             }
 
             @Override

@@ -36,20 +36,20 @@ public class Hooks
         MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Gui.Post(heldItem, matrixStack, renderTypeBuffer));
     }
 
-    public static boolean fireRenderPlayerPre(LivingEntity entity, EntityModel model, MatrixStack matrixStack, IVertexBuilder builder)
+    public static boolean fireRenderPlayerPre(LivingEntity entity, EntityModel model, MatrixStack matrixStack, IVertexBuilder builder, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
     {
         if(entity instanceof PlayerEntity)
         {
-            return MinecraftForge.EVENT_BUS.post(new PlayerModelEvent.Render.Pre((PlayerEntity) entity, (PlayerModel) model, matrixStack, builder, Minecraft.getInstance().getRenderPartialTicks()));
+            return MinecraftForge.EVENT_BUS.post(new PlayerModelEvent.Render.Pre((PlayerEntity) entity, (PlayerModel) model, matrixStack, builder, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, Minecraft.getInstance().getRenderPartialTicks()));
         }
         return false;
     }
 
-    public static void fireRenderPlayerPost(LivingEntity entity, EntityModel model, MatrixStack matrixStack, IVertexBuilder builder)
+    public static void fireRenderPlayerPost(LivingEntity entity, EntityModel model, MatrixStack matrixStack, IVertexBuilder builder, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
     {
         if(entity instanceof PlayerEntity)
         {
-            MinecraftForge.EVENT_BUS.post(new PlayerModelEvent.Render.Post((PlayerEntity) entity, (PlayerModel) model, matrixStack, builder, Minecraft.getInstance().getRenderPartialTicks()));
+            MinecraftForge.EVENT_BUS.post(new PlayerModelEvent.Render.Post((PlayerEntity) entity, (PlayerModel) model, matrixStack, builder, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, Minecraft.getInstance().getRenderPartialTicks()));
         }
     }
 }
