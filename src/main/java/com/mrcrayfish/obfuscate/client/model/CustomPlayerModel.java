@@ -25,38 +25,16 @@ public class CustomPlayerModel extends PlayerModel<AbstractClientPlayerEntity>
     //func_225597_a_
 
     @Override
-    public void func_225597_a_(AbstractClientPlayerEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
+    public void render(AbstractClientPlayerEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
     {
         this.resetRotationAngles();
         if(!MinecraftForge.EVENT_BUS.post(new PlayerModelEvent.SetupAngles.Pre(entityIn, this, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, Minecraft.getInstance().getRenderPartialTicks())))
         {
-            super.func_225597_a_(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+            super.render(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
             MinecraftForge.EVENT_BUS.post(new PlayerModelEvent.SetupAngles.Post(entityIn, this, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, Minecraft.getInstance().getRenderPartialTicks()));
         }
         this.setupRotationAngles();
     }
-
-    //func_225598_a_
-
-    @Override
-    public void func_225598_a_(MatrixStack matrixStack, IVertexBuilder vertexBuilder, int p_225598_3_, int p_225598_4_, float p_225598_5_, float p_225598_6_, float p_225598_7_, float p_225598_8_)
-    {
-        super.func_225598_a_(matrixStack, vertexBuilder, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
-        /*this.resetVisibilities();
-        if(!MinecraftForge.EVENT_BUS.post(new PlayerModelEvent.Render.Pre(entityIn, this, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, Minecraft.getInstance().getRenderPartialTicks())))
-        {
-            super.func_225598_a_(matrixStack, vertexBuilder, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
-            MinecraftForge.EVENT_BUS.post(new PlayerModelEvent.Render.Post(entityIn, this, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, Minecraft.getInstance().getRenderPartialTicks()));
-        }*/
-
-    }
-
-    /*@Override
-    public void render(AbstractClientPlayerEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale)
-    {
-
-
-    }*/
 
     private void setupRotationAngles()
     {

@@ -35,9 +35,9 @@ public class CustomItemRenderer extends ItemRenderer
     }
 
     @Override
-    public void func_225623_a_(ItemEntity entity, float p_225623_2_, float partialTicks, MatrixStack matrix, IRenderTypeBuffer buffer, int p_225623_6_)
+    public void render(ItemEntity entity, float p_225623_2_, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer buffer, int light)
     {
-        matrix.func_227860_a_();
+        matrixStack.push();
         ItemStack stack = entity.getItem();
         int seed = stack.isEmpty() ? 187 : Item.getIdFromItem(stack.getItem()) + stack.getDamage();
         this.random.setSeed((long) seed);
@@ -46,20 +46,20 @@ public class CustomItemRenderer extends ItemRenderer
         int modelCount = this.getModelCount(stack);
         float bobOffset = shouldBob() ? MathHelper.sin(((float) entity.getAge() + partialTicks) / 10.0F + entity.hoverStart) * 0.1F + 0.1F : 0;
         float yScale = model.getItemCameraTransforms().getTransform(ItemCameraTransforms.TransformType.GROUND).scale.getY();
-        matrix.func_227861_a_(0.0D, (double) (bobOffset + 0.25F * yScale), 0.0D);
+        matrixStack.translate(0.0D, (double) (bobOffset + 0.25F * yScale), 0.0D);
         float rotation = ((float) entity.getAge() + partialTicks) / 20.0F + entity.hoverStart;
-        matrix.func_227863_a_(Vector3f.field_229181_d_.func_229193_c_(rotation));
+        matrixStack.rotate(Vector3f.field_229181_d_.func_229193_c_(rotation));
         if(!isGui3d)
         {
             float x = -0.0F * (float) (modelCount - 1) * 0.5F;
             float y = -0.0F * (float) (modelCount - 1) * 0.5F;
             float z = -0.09375F * (float) (modelCount - 1) * 0.5F;
-            matrix.func_227861_a_((double) x, (double) y, (double) z);
+            matrixStack.translate((double) x, (double) y, (double) z);
         }
 
         for(int m = 0; m < modelCount; m++)
         {
-            matrix.func_227860_a_(); //push
+            matrixStack.push();
             if(m > 0)
             {
                 if(isGui3d)
@@ -67,31 +67,31 @@ public class CustomItemRenderer extends ItemRenderer
                     float x = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
                     float y = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
                     float z = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
-                    matrix.func_227861_a_(shouldSpreadItems() ? x : 0, shouldSpreadItems() ? y : 0, shouldSpreadItems() ? z : 0);
+                    matrixStack.translate(shouldSpreadItems() ? x : 0, shouldSpreadItems() ? y : 0, shouldSpreadItems() ? z : 0);
                 }
                 else
                 {
                     float x = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F * 0.5F;
                     float y = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F * 0.5F;
-                    matrix.func_227861_a_(shouldSpreadItems() ? x : 0, shouldSpreadItems() ? y : 0, 0.0D);
+                    matrixStack.translate(shouldSpreadItems() ? x : 0, shouldSpreadItems() ? y : 0, 0);
                 }
             }
 
-            boolean cancelled = MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Pre(entity, stack, matrix, buffer, partialTicks));
+            boolean cancelled = MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Pre(entity, stack, matrixStack, buffer, partialTicks));
             if(!cancelled)
             {
-                this.itemRenderer.func_229111_a_(stack, ItemCameraTransforms.TransformType.GROUND, false, matrix, buffer, p_225623_6_, OverlayTexture.field_229196_a_, model);
-                MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Post(entity, stack, matrix, buffer, partialTicks));
+                this.itemRenderer.func_229111_a_(stack, ItemCameraTransforms.TransformType.GROUND, false, matrixStack, buffer, light, OverlayTexture.DEFAULT_LIGHT, model);
+                MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Post(entity, stack, matrixStack, buffer, partialTicks));
             }
-            matrix.func_227865_b_(); //pop
+            matrixStack.pop();
 
             if(!isGui3d)
             {
-                matrix.func_227861_a_(0.0, 0.0, 0.09375F);
+                matrixStack.translate(0.0, 0.0, 0.09375);
             }
         }
 
-        matrix.func_227865_b_();
-        super.func_225623_a_(entity, p_225623_2_, partialTicks, matrix, buffer, p_225623_6_);
+        matrixStack.pop();
+        super.render(entity, p_225623_2_, partialTicks, matrixStack, buffer, light);
     }
 }

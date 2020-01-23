@@ -39,8 +39,8 @@ public class ClientProxy extends CommonProxy
         Obfuscate.LOGGER.info("Starting to patch player models...");
 
         Map<String, PlayerRenderer> skinMap = Minecraft.getInstance().getRenderManager().getSkinMap();
-        patchPlayerRender(skinMap.get("default"), false);
-        patchPlayerRender(skinMap.get("slim"), true);
+        this.patchPlayerRender(skinMap.get("default"), false);
+        this.patchPlayerRender(skinMap.get("slim"), true);
     }
 
     private void patchPlayerRender(PlayerRenderer player, boolean smallArms)

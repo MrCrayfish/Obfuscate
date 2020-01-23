@@ -18,7 +18,7 @@ public class CustomBipedModel<T extends LivingEntity> extends BipedModel<T>
     }
 
     @Override
-    public void func_225597_a_(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
+    public void setLivingAnimations(T entityIn, float limbSwing, float limbSwingAmount, float partialTick)
     {
         copyProperties(source.bipedHeadwear, bipedHeadwear);
         copyProperties(source.bipedHead, bipedHead);

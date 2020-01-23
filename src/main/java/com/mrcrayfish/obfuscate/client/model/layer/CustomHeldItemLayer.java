@@ -39,15 +39,15 @@ public class CustomHeldItemLayer<T extends LivingEntity, M extends EntityModel<T
         ItemStack leftHandStack = rightHanded ? entity.getHeldItemMainhand() : entity.getHeldItemOffhand();
         if(!rightHandStack.isEmpty() || !leftHandStack.isEmpty())
         {
-            matrixStack.func_227860_a_(); //Push
+            matrixStack.push();
             if(this.getEntityModel().isChild)
             {
-                matrixStack.func_227861_a_(0.0D, 0.75D, 0.0D);
-                matrixStack.func_227862_a_(0.5F, 0.5F, 0.5F);
+                matrixStack.translate(0.0D, 0.75D, 0.0D);
+                matrixStack.scale(0.5F, 0.5F, 0.5F);
             }
             this.renderHeldItem(entity, leftHandStack, ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND, HandSide.RIGHT, matrixStack, renderTypeBuffer, light, partialTicks);
             this.renderHeldItem(entity, rightHandStack, ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND, HandSide.LEFT, matrixStack, renderTypeBuffer, light, partialTicks);
-            matrixStack.func_227865_b_(); //Pop
+            matrixStack.pop(); //Pop
         }
     }
 
@@ -55,18 +55,18 @@ public class CustomHeldItemLayer<T extends LivingEntity, M extends EntityModel<T
     {
         if(!stack.isEmpty())
         {
-            matrixStack.func_227860_a_();
+            matrixStack.push();
             this.getEntityModel().func_225599_a_(handSide, matrixStack);
-            matrixStack.func_227863_a_(Vector3f.field_229179_b_.func_229187_a_(-90.0F));
-            matrixStack.func_227863_a_(Vector3f.field_229181_d_.func_229187_a_(180.0F));
+            matrixStack.rotate(Vector3f.field_229179_b_.func_229187_a_(-90.0F));
+            matrixStack.rotate(Vector3f.field_229181_d_.func_229187_a_(180.0F));
             boolean leftHanded = handSide == HandSide.LEFT;
-            matrixStack.func_227861_a_((double) ((float) (leftHanded ? -1 : 1) / 16.0F), 0.125D, -0.625D);
+            matrixStack.translate((double) ((float) (leftHanded ? -1 : 1) / 16.0F), 0.125D, -0.625D);
             if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held.Pre(entity, stack, transformType, matrixStack, renderTypeBuffer, handSide, partialTicks)))
             {
-                Minecraft.getInstance().getFirstPersonRenderer().func_228397_a_(entity, stack, transformType, leftHanded, matrixStack, renderTypeBuffer, light);
+                Minecraft.getInstance().getFirstPersonRenderer().renderItemSide(entity, stack, transformType, leftHanded, matrixStack, renderTypeBuffer, light);
                 MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held.Post(entity, stack, transformType, matrixStack, renderTypeBuffer, handSide, partialTicks));
             }
-            matrixStack.func_227865_b_();
+            matrixStack.pop();
         }
     }
 }
