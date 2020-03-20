@@ -6,6 +6,8 @@ import com.google.common.eventbus.Subscribe;
 import com.mrcrayfish.obfuscate.proxy.CommonProxy;
 import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.event.FMLConstructionEvent;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
@@ -67,5 +69,11 @@ public class Obfuscate extends DummyModContainer
     public void preInit(FMLPreInitializationEvent event)
     {
         proxy.preInit();
+    }
+
+    @Subscribe
+    public void init(FMLInitializationEvent event)
+    {
+        proxy.init();
     }
 }

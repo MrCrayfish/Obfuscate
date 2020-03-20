@@ -1,7 +1,6 @@
 package com.mrcrayfish.obfuscate.client.renderer.entity;
 
 import com.mrcrayfish.obfuscate.client.event.RenderItemEvent;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderItem;
@@ -13,10 +12,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.Constants;
 
 import java.util.Random;
 
@@ -39,7 +36,7 @@ public class RenderCustomEntityItem extends RenderEntityItem
         ItemStack itemstack = itemIn.getItem();
         Item item = itemstack.getItem();
 
-        if (item == null)
+        if(item == null)
         {
             return 0;
         }
@@ -48,13 +45,13 @@ public class RenderCustomEntityItem extends RenderEntityItem
             boolean flag = p_177077_9_.isGui3d();
             int i = this.getModelCount(itemstack);
             float f = 0.25F;
-            float f1 = shouldBob() ? MathHelper.sin(((float)itemIn.getAge() + p_177077_8_) / 10.0F + itemIn.hoverStart) * 0.1F + 0.1F : 0;
+            float f1 = shouldBob() ? MathHelper.sin(((float) itemIn.getAge() + p_177077_8_) / 10.0F + itemIn.hoverStart) * 0.1F + 0.1F : 0;
             float f2 = p_177077_9_.getItemCameraTransforms().getTransform(ItemCameraTransforms.TransformType.GROUND).scale.y;
-            GlStateManager.translate((float)p_177077_2_, (float)p_177077_4_ + f1 + 0.25F * f2, (float)p_177077_6_);
+            GlStateManager.translate((float) p_177077_2_, (float) p_177077_4_ + f1 + 0.25F * f2, (float) p_177077_6_);
 
-            if (flag || this.renderManager.options != null)
+            if(flag || this.renderManager.options != null)
             {
-                float f3 = (((float)itemIn.getAge() + p_177077_8_) / 20.0F + itemIn.hoverStart) * (180F / (float)Math.PI);
+                float f3 = (((float) itemIn.getAge() + p_177077_8_) / 20.0F + itemIn.hoverStart) * (180F / (float) Math.PI);
                 GlStateManager.rotate(f3, 0.0F, 1.0F, 0.0F);
             }
 
@@ -66,12 +63,12 @@ public class RenderCustomEntityItem extends RenderEntityItem
     @Override
     public void doRender(EntityItem entity, double x, double y, double z, float entityYaw, float partialTicks)
     {
-        ItemStack itemstack = entity.getItem();
-        int i = itemstack.isEmpty() ? 187 : Item.getIdFromItem(itemstack.getItem()) + itemstack.getMetadata();
-        this.random.setSeed((long)i);
+        ItemStack stack = entity.getItem();
+        int seed = stack.isEmpty() ? 187 : Item.getIdFromItem(stack.getItem()) + stack.getMetadata();
+        this.random.setSeed((long) seed);
         boolean flag = false;
 
-        if (this.bindEntityTexture(entity))
+        if(this.bindEntityTexture(entity))
         {
             this.renderManager.renderEngine.getTexture(this.getEntityTexture(entity)).setBlurMipmap(false, false);
             flag = true;
@@ -83,52 +80,43 @@ public class RenderCustomEntityItem extends RenderEntityItem
         RenderHelper.enableStandardItemLighting();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.pushMatrix();
-        IBakedModel ibakedmodel = this.renderItem.getItemModelWithOverrides(itemstack, entity.world, (EntityLivingBase)null);
-        int j = this.transformModelCount(entity, x, y, z, partialTicks, ibakedmodel);
-        boolean flag1 = ibakedmodel.isGui3d();
+        IBakedModel model = this.renderItem.getItemModelWithOverrides(stack, entity.world, (EntityLivingBase) null);
+        int modelCount = this.transformModelCount(entity, x, y, z, partialTicks, model);
+        boolean is3D = model.isGui3d();
 
-        if (!flag1)
+        if(!is3D)
         {
-            float f3 = -0.0F * (float)(j - 1) * 0.5F;
-            float f4 = -0.0F * (float)(j - 1) * 0.5F;
-            float f5 = -0.09375F * (float)(j - 1) * 0.5F;
-            GlStateManager.translate(f3, f4, f5);
+            float offsetX = -0.0F * (float) (modelCount - 1) * 0.5F;
+            float offsetY = -0.0F * (float) (modelCount - 1) * 0.5F;
+            float offsetZ = -0.09375F * (float) (modelCount - 1) * 0.5F;
+            GlStateManager.translate(offsetX, offsetY, offsetZ);
         }
 
-        if (this.renderOutlines)
+        if(this.renderOutlines)
         {
             GlStateManager.enableColorMaterial();
             GlStateManager.enableOutlineMode(this.getTeamColor(entity));
         }
 
-        for (int k = 0; k < j; ++k)
+        for(int k = 0; k < modelCount; ++k)
         {
-            if (flag1)
+            if(is3D)
             {
                 GlStateManager.pushMatrix();
 
-                if (k > 0)
+                if(k > 0)
                 {
-                    float f7 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
-                    float f9 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
-                    float f6 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
-                    GlStateManager.translate(shouldSpreadItems() ? f7 : 0, shouldSpreadItems() ? f9 : 0, f6);
+                    float offsetX = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
+                    float offsetY = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
+                    float offsetZ = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F;
+                    GlStateManager.translate(this.shouldSpreadItems() ? offsetX : 0, this.shouldSpreadItems() ? offsetY : 0, offsetZ);
                 }
 
-                GlStateManager.pushMatrix();
-                boolean cancelled = MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Pre(entity, itemstack, partialTicks));
-                GlStateManager.popMatrix();
-
-                if(!cancelled)
+                if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Pre(entity, stack, partialTicks)))
                 {
-                    GlStateManager.pushMatrix();
-                    IBakedModel transformedModel = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(ibakedmodel, ItemCameraTransforms.TransformType.GROUND, false);
-                    this.renderItem.renderItem(itemstack, transformedModel);
-                    GlStateManager.popMatrix();
-
-                    GlStateManager.pushMatrix();
-                    MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Post(entity, itemstack, partialTicks));
-                    GlStateManager.popMatrix();
+                    IBakedModel transformedModel = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(model, ItemCameraTransforms.TransformType.GROUND, false);
+                    this.renderItem.renderItem(stack, transformedModel);
+                    MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Post(entity, stack, partialTicks));
                 }
 
                 GlStateManager.popMatrix();
@@ -137,21 +125,21 @@ public class RenderCustomEntityItem extends RenderEntityItem
             {
                 GlStateManager.pushMatrix();
 
-                if (k > 0)
+                if(k > 0)
                 {
                     float f8 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F * 0.5F;
                     float f10 = (this.random.nextFloat() * 2.0F - 1.0F) * 0.15F * 0.5F;
                     GlStateManager.translate(f8, f10, 0.0F);
                 }
 
-                IBakedModel transformedModel = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(ibakedmodel, ItemCameraTransforms.TransformType.GROUND, false);
-                this.renderItem.renderItem(itemstack, transformedModel);
+                IBakedModel transformedModel = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(model, ItemCameraTransforms.TransformType.GROUND, false);
+                this.renderItem.renderItem(stack, transformedModel);
                 GlStateManager.popMatrix();
                 GlStateManager.translate(0.0F, 0.0F, 0.09375F);
             }
         }
 
-        if (this.renderOutlines)
+        if(this.renderOutlines)
         {
             GlStateManager.disableOutlineMode();
             GlStateManager.disableColorMaterial();
@@ -162,9 +150,14 @@ public class RenderCustomEntityItem extends RenderEntityItem
         GlStateManager.disableBlend();
         this.bindEntityTexture(entity);
 
-        if (flag)
+        if(flag)
         {
             this.renderManager.renderEngine.getTexture(this.getEntityTexture(entity)).restoreLastBlurMipmap();
+        }
+
+        if(!this.renderOutlines)
+        {
+            this.renderName(entity, x, y, z);
         }
     }
 }
