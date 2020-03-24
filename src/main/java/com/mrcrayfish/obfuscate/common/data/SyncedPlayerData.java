@@ -22,13 +22,27 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Basically a clone of DataParameter system. It's not good to register custom data parameters to
+ * <p>Basically a clone of DataParameter system. It's not good to register custom data parameters to
  * other entities that aren't your own. It can cause mismatched ids and crash the game. This synced
- * data system attempts to solve the problem (at least for players) and allows data to be synced to
- * clients. The data can only be controlled on the server. Changing the data on the client will have
- * no affect on the server.
- *
- * Author: MrCrayfish
+ * data system attempts to solve the problem (at least for player entities) and allows data to be
+ * easily synced to clients. The data can only be controlled on the logical server. Changing the
+ * data on the logical client will have no affect on the server.</p>
+ * <p></p>
+ * <p>To use this system you first need to create a synced data key instance. This should be a public
+ * static final field. You will need to specify an key id (based on your modid), the serializer, and
+ * a default value supplier.</p>
+ * <code>public static final SyncedDataKey&lt;Double&gt; CURRENT_SPEED = SyncedDataKey.create(new ResourceLocation("examplemod:speed"), Serializers.DOUBLE, () -> 0.0);</code>
+ * <p></p>
+ * <p>Next the key needs to be registered. This can simply be done in the common setup of your mod.</p>
+ * <code>SyncedPlayerData.instance().registerKey(CURRENT_SPEED);</code>
+ * <p></p>
+ * <p>Then anywhere you want (as long as it's on the main thread), you can set the value by calling</p>
+ * <code>SyncedPlayerData.instance().set(player, CURRENT_SPEED, 5.0);</code>
+ * <p></p>
+ * <p>The value can be retrieved on the server or client by calling</p>
+ * <code>SyncedPlayerData.instance().get(player, CURRENT_SPEED);</code>
+ * <p></p>
+ * <p>Author: MrCrayfish</p>
  */
 public class SyncedPlayerData
 {
@@ -50,7 +64,12 @@ public class SyncedPlayerData
         }
         return instance;
     }
-    
+
+    /**
+     * Registers a synced data key into the system.
+     *
+     * @param key a synced data key instance
+     */
     public void registerKey(SyncedDataKey<?> key)
     {
         if(this.registeredDataKeys.containsKey(key.getKey()))
@@ -63,6 +82,13 @@ public class SyncedPlayerData
         this.idToDataKey.put(nextId, key);
     }
 
+    /**
+     * Sets the value of a synced data key to the specified player
+     *
+     * @param player the player to assign the value to
+     * @param key a registered synced data key
+     * @param value a new value that matches the synced data key type
+     */
     public <T> void set(PlayerEntity player, SyncedDataKey<T> key, T value)
     {
         if(!this.registeredDataKeys.values().contains(key))
@@ -79,6 +105,12 @@ public class SyncedPlayerData
         }
     }
 
+    /**
+     * Gets the value for the synced data key from the specified player
+     *
+     * @param player the player to retrieve the data from
+     * @param key a registered synced data key
+     */
     public <T> T get(PlayerEntity player, SyncedDataKey<T> key)
     {
         if(!this.registeredDataKeys.values().contains(key))
