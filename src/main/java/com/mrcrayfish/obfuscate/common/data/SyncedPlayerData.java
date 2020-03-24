@@ -17,7 +17,6 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import org.apache.commons.lang3.Validate;
 
 import javax.annotation.Nullable;
-import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,7 +49,7 @@ public class SyncedPlayerData
 
     private final Map<ResourceLocation, SyncedDataKey<?>> registeredDataKeys = new HashMap<>();
     private final Map<Integer, SyncedDataKey<?>> idToDataKey = new HashMap<>();
-    private final WeakHashMap<PlayerEntity, Holder> playerDataMap = new WeakHashMap<>();
+    private final WeakHashMap<UUID, Holder> playerDataMap = new WeakHashMap<>();
     private int nextKeyId = 0;
     private boolean dirty = false;
 
@@ -96,7 +95,7 @@ public class SyncedPlayerData
             throw new IllegalArgumentException(String.format("The data key '%s' is not registered!", key.getKey()));
         }
         Holder holder = this.getPlayerData(player);
-        if(holder.set(key, value))
+        if(holder.set(player, key, value))
         {
             if(!player.world.isRemote)
             {
@@ -134,7 +133,7 @@ public class SyncedPlayerData
 
     private Holder getPlayerData(PlayerEntity player)
     {
-        return this.playerDataMap.computeIfAbsent(player, Holder::new);
+        return this.playerDataMap.computeIfAbsent(player.getUniqueID(), uuid -> new Holder());
     }
 
     @SubscribeEvent
@@ -167,20 +166,48 @@ public class SyncedPlayerData
     }
 
     @SubscribeEvent
+    public void onPlayerClone(PlayerEvent.Clone event)
+    {
+        PlayerEntity original = event.getOriginal();
+        if(!original.world.isRemote)
+        {
+            PlayerEntity player = event.getPlayer();
+            Holder holder = this.playerDataMap.remove(original.getUniqueID());
+            if(holder != null)
+            {
+                this.playerDataMap.put(player.getUniqueID(), holder);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onServerTick(TickEvent.PlayerTickEvent event)
+    {
+        if(event.phase == TickEvent.Phase.END)
+        {
+            if(this.dirty)
+            {
+                PlayerEntity player = event.player;
+                if(!player.world.isRemote())
+                {
+                    Holder holder = this.getPlayerData(player);
+                    if(player.isAlive() && holder.isDirty())
+                    {
+                        PacketHandler.getPlayChannel().send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new MessageSyncPlayerData(player.getEntityId(), holder, false));
+                        holder.clean();
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent event)
     {
         if(event.phase == TickEvent.Phase.END)
         {
             if(this.dirty)
             {
-                this.playerDataMap.forEach((player, holder) ->
-                {
-                    if(player.isAlive() && holder.isDirty())
-                    {
-                        PacketHandler.getPlayChannel().send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new MessageSyncPlayerData(player.getEntityId(), holder, false));
-                        holder.clean();
-                    }
-                });
                 this.dirty = false;
             }
         }
@@ -188,23 +215,16 @@ public class SyncedPlayerData
 
     public static class Holder
     {
-        private WeakReference<PlayerEntity> playerRef;
-        private final Map<SyncedDataKey<?>, DataEntry<?>> dataMap = new HashMap<>();
+        private Map<SyncedDataKey<?>, DataEntry<?>> dataMap = new HashMap<>();
         private boolean dirty = false;
 
-        Holder(PlayerEntity player)
-        {
-            this.playerRef = new WeakReference<>(player);
-        }
-
         @SuppressWarnings("unchecked")
-        public <T> boolean set(SyncedDataKey<T> key, T value)
+        public <T> boolean set(PlayerEntity player, SyncedDataKey<T> key, T value)
         {
             DataEntry<T> entry = (DataEntry<T>) this.dataMap.computeIfAbsent(key, DataEntry::new);
             if(!entry.getValue().equals(value))
             {
-                PlayerEntity player = this.playerRef.get();
-                boolean dirty = player != null && !player.world.isRemote;
+                boolean dirty = !player.world.isRemote;
                 entry.setValue(value, dirty);
                 this.dirty = dirty;
                 return true;
@@ -216,7 +236,7 @@ public class SyncedPlayerData
         @SuppressWarnings("unchecked")
         public <T> T get(SyncedDataKey<T> key)
         {
-            return (T) this.dataMap.computeIfAbsent(key, DataEntry::new);
+            return (T) this.dataMap.computeIfAbsent(key, DataEntry::new).getValue();
         }
 
         public boolean isDirty()
