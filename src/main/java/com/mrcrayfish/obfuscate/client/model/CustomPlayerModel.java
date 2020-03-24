@@ -1,7 +1,5 @@
 package com.mrcrayfish.obfuscate.client.model;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
 import com.mrcrayfish.obfuscate.client.event.PlayerModelEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;

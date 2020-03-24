@@ -4,7 +4,6 @@ import com.mrcrayfish.obfuscate.common.data.SyncedPlayerData;
 import com.mrcrayfish.obfuscate.network.PacketHandler;
 import com.mrcrayfish.obfuscate.proxy.ClientProxy;
 import com.mrcrayfish.obfuscate.proxy.CommonProxy;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;

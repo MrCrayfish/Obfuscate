@@ -1,6 +1,5 @@
 package com.mrcrayfish.obfuscate.common.data;
 
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.network.PacketBuffer;
 
