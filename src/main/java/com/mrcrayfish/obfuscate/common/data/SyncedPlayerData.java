@@ -1,14 +1,25 @@
 package com.mrcrayfish.obfuscate.common.data;
 
 import com.google.common.collect.ImmutableList;
+import com.mrcrayfish.obfuscate.Reference;
 import com.mrcrayfish.obfuscate.network.HandshakeMessages;
 import com.mrcrayfish.obfuscate.network.PacketHandler;
 import com.mrcrayfish.obfuscate.network.message.MessageSyncPlayerData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -16,12 +27,16 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.PacketDistributor;
 import org.apache.commons.lang3.Validate;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * <p>Basically a clone of DataParameter system. It's not good to register custom data parameters to
+ * <p>Basically a clone of DataParameter system. It's not good to init custom data parameters to
  * other entities that aren't your own. It can cause mismatched ids and crash the game. This synced
  * data system attempts to solve the problem (at least for player entities) and allows data to be
  * easily synced to clients. The data can only be controlled on the logical server. Changing the
@@ -45,11 +60,14 @@ import java.util.stream.Collectors;
  */
 public class SyncedPlayerData
 {
+    @CapabilityInject(DataHolder.class)
+    public static final Capability<DataHolder> CAPABILITY = null;
+
     private static SyncedPlayerData instance;
+    private static boolean init = false;
 
     private final Map<ResourceLocation, SyncedDataKey<?>> registeredDataKeys = new HashMap<>();
     private final Map<Integer, SyncedDataKey<?>> idToDataKey = new HashMap<>();
-    private final WeakHashMap<UUID, Holder> playerDataMap = new WeakHashMap<>();
     private int nextKeyId = 0;
     private boolean dirty = false;
 
@@ -62,6 +80,16 @@ public class SyncedPlayerData
             instance = new SyncedPlayerData();
         }
         return instance;
+    }
+
+    public static void init()
+    {
+        if(!init)
+        {
+            CapabilityManager.INSTANCE.register(DataHolder.class, new Storage(), DataHolder::new);
+            MinecraftForge.EVENT_BUS.register(instance());
+            init = true;
+        }
     }
 
     /**
@@ -85,8 +113,8 @@ public class SyncedPlayerData
      * Sets the value of a synced data key to the specified player
      *
      * @param player the player to assign the value to
-     * @param key a registered synced data key
-     * @param value a new value that matches the synced data key type
+     * @param key    a registered synced data key
+     * @param value  a new value that matches the synced data key type
      */
     public <T> void set(PlayerEntity player, SyncedDataKey<T> key, T value)
     {
@@ -94,8 +122,8 @@ public class SyncedPlayerData
         {
             throw new IllegalArgumentException(String.format("The data key '%s' is not registered!", key.getKey()));
         }
-        Holder holder = this.getPlayerData(player);
-        if(holder.set(player, key, value))
+        DataHolder holder = this.getDataHolder(player);
+        if(holder != null && holder.set(player, key, value))
         {
             if(!player.world.isRemote)
             {
@@ -105,10 +133,11 @@ public class SyncedPlayerData
     }
 
     /**
-     * Gets the value for the synced data key from the specified player
+     * Gets the value for the synced data key from the specified player. It is best to check that
+     * the player is alive before getting the value.
      *
      * @param player the player to retrieve the data from
-     * @param key a registered synced data key
+     * @param key    a registered synced data key
      */
     public <T> T get(PlayerEntity player, SyncedDataKey<T> key)
     {
@@ -116,8 +145,8 @@ public class SyncedPlayerData
         {
             throw new IllegalArgumentException(String.format("The data key '%s' is not registered!", key.getKey()));
         }
-        Holder holder = this.getPlayerData(player);
-        return holder.get(key);
+        DataHolder holder = this.getDataHolder(player);
+        return holder != null ? holder.get(key) : key.getDefaultValueSupplier().get();
     }
 
     @Nullable
@@ -131,9 +160,19 @@ public class SyncedPlayerData
         return ImmutableList.copyOf(this.registeredDataKeys.values());
     }
 
-    private Holder getPlayerData(PlayerEntity player)
+    @Nullable
+    private DataHolder getDataHolder(PlayerEntity player)
     {
-        return this.playerDataMap.computeIfAbsent(player.getUniqueID(), uuid -> new Holder());
+        return player.getCapability(CAPABILITY, null).orElse(null);
+    }
+
+    @SubscribeEvent
+    public void attachCapabilities(AttachCapabilitiesEvent<Entity> event)
+    {
+        if(event.getObject() instanceof PlayerEntity)
+        {
+            event.addCapability(new ResourceLocation(Reference.MOD_ID, "synced_player_data"), new Provider());
+        }
     }
 
     @SubscribeEvent
@@ -142,7 +181,7 @@ public class SyncedPlayerData
         if(event.getTarget() instanceof PlayerEntity && !event.getPlayer().world.isRemote)
         {
             PlayerEntity player = (PlayerEntity) event.getTarget();
-            Holder holder = this.getPlayerData(player);
+            DataHolder holder = this.getDataHolder(player);
             if(holder != null)
             {
                 PacketHandler.getPlayChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) event.getPlayer()), new MessageSyncPlayerData(player.getEntityId(), holder, true));
@@ -157,7 +196,7 @@ public class SyncedPlayerData
         if(entity instanceof PlayerEntity && !event.getWorld().isRemote)
         {
             PlayerEntity player = (PlayerEntity) entity;
-            Holder holder = this.getPlayerData(player);
+            DataHolder holder = this.getDataHolder(player);
             if(holder != null)
             {
                 PacketHandler.getPlayChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), new MessageSyncPlayerData(player.getEntityId(), holder, true));
@@ -172,10 +211,14 @@ public class SyncedPlayerData
         if(!original.world.isRemote)
         {
             PlayerEntity player = event.getPlayer();
-            Holder holder = this.playerDataMap.remove(original.getUniqueID());
-            if(holder != null)
+            DataHolder oldHolder = this.getDataHolder(original);
+            if(oldHolder != null)
             {
-                this.playerDataMap.put(player.getUniqueID(), holder);
+                DataHolder newHolder = this.getDataHolder(player);
+                if(newHolder != null)
+                {
+                    newHolder.dataMap = new HashMap<>(oldHolder.dataMap);
+                }
             }
         }
     }
@@ -190,8 +233,8 @@ public class SyncedPlayerData
                 PlayerEntity player = event.player;
                 if(!player.world.isRemote())
                 {
-                    Holder holder = this.getPlayerData(player);
-                    if(player.isAlive() && holder.isDirty())
+                    DataHolder holder = this.getDataHolder(player);
+                    if(holder != null && holder.isDirty())
                     {
                         PacketHandler.getPlayChannel().send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new MessageSyncPlayerData(player.getEntityId(), holder, false));
                         holder.clean();
@@ -213,7 +256,7 @@ public class SyncedPlayerData
         }
     }
 
-    public static class Holder
+    public static class DataHolder
     {
         private Map<SyncedDataKey<?>, DataEntry<?>> dataMap = new HashMap<>();
         private boolean dirty = false;
@@ -322,7 +365,6 @@ public class SyncedPlayerData
 
     public boolean updateMappings(HandshakeMessages.S2CSyncedPlayerData message)
     {
-        this.playerDataMap.clear();
         this.idToDataKey.clear();
         Map<ResourceLocation, Integer> keyMappings = message.getKeyMap();
         for(ResourceLocation key : keyMappings.keySet())
@@ -334,5 +376,45 @@ public class SyncedPlayerData
             this.idToDataKey.put(id, syncedDataKey);
         }
         return true;
+    }
+
+    public static class Storage implements Capability.IStorage<DataHolder>
+    {
+        @Nullable
+        @Override
+        public INBT writeNBT(Capability<DataHolder> capability, DataHolder instance, Direction side)
+        {
+            return new CompoundNBT();
+        }
+
+        @Override
+        public void readNBT(Capability<DataHolder> capability, DataHolder instance, Direction side, INBT nbt)
+        {
+
+        }
+    }
+
+    public static class Provider implements ICapabilitySerializable<CompoundNBT>
+    {
+        final DataHolder INSTANCE = CAPABILITY.getDefaultInstance();
+
+        @Override
+        public CompoundNBT serializeNBT()
+        {
+            return (CompoundNBT) CAPABILITY.getStorage().writeNBT(CAPABILITY, INSTANCE, null);
+        }
+
+        @Override
+        public void deserializeNBT(CompoundNBT compound)
+        {
+            CAPABILITY.getStorage().readNBT(CAPABILITY, INSTANCE, null, compound);
+        }
+
+        @Nonnull
+        @Override
+        public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side)
+        {
+            return CAPABILITY.orEmpty(cap, LazyOptional.of(() -> INSTANCE));
+        }
     }
 }

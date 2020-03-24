@@ -20,7 +20,7 @@ public class MessageSyncPlayerData implements IMessage<MessageSyncPlayerData>
 
     public MessageSyncPlayerData() {}
 
-    public MessageSyncPlayerData(int entityId, SyncedPlayerData.Holder holder, boolean sendAll)
+    public MessageSyncPlayerData(int entityId, SyncedPlayerData.DataHolder holder, boolean sendAll)
     {
         this.entityId = entityId;
         this.entries = sendAll ? holder.gatherAll() : holder.gatherDirty();

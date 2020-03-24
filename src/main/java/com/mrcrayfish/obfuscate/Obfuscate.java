@@ -27,11 +27,11 @@ public class Obfuscate
     {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupCommon);
-        MinecraftForge.EVENT_BUS.register(SyncedPlayerData.instance());
     }
 
     private void setupCommon(FMLCommonSetupEvent event)
     {
+        SyncedPlayerData.init();
         PacketHandler.register();
     }
 
