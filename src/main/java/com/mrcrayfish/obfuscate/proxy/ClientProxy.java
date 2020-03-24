@@ -5,6 +5,7 @@ import com.mrcrayfish.obfuscate.client.model.CustomBipedModel;
 import com.mrcrayfish.obfuscate.client.model.CustomPlayerModel;
 import com.mrcrayfish.obfuscate.client.model.layer.CustomHeldItemLayer;
 import com.mrcrayfish.obfuscate.client.renderer.entity.CustomItemRenderer;
+import com.mrcrayfish.obfuscate.common.data.SyncedPlayerData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.renderer.entity.LivingRenderer;
@@ -14,7 +15,10 @@ import net.minecraft.client.renderer.entity.layers.HeadLayer;
 import net.minecraft.client.renderer.entity.layers.HeldItemLayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
@@ -56,5 +60,26 @@ public class ClientProxy extends CommonProxy
         ObfuscationReflectionHelper.setPrivateValue(LivingRenderer.class, player, model, "field_77045_g");
 
         Obfuscate.LOGGER.info("Patched " + (smallArms ? "slim" : "default") + " model successfully");
+    }
+
+    @Override
+    public void updatePlayerData(int entityId, List<SyncedPlayerData.DataEntry<?>> entries)
+    {
+        World world = Minecraft.getInstance().world;
+        if(world != null)
+        {
+            Entity entity = world.getEntityByID(entityId);
+            if(entity instanceof PlayerEntity)
+            {
+                PlayerEntity player = (PlayerEntity) entity;
+                entries.forEach(entry -> this.setSyncedValue(player, entry));
+                Obfuscate.LOGGER.info("Updating synced data...");
+            }
+        }
+    }
+
+    private <T> void setSyncedValue(PlayerEntity player, SyncedPlayerData.DataEntry<T> entry)
+    {
+        SyncedPlayerData.instance().set(player, entry.getKey(), entry.getValue());
     }
 }
