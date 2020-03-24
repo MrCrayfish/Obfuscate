@@ -30,7 +30,7 @@ public class Serializers
         @Override
         public INBT write(Boolean value)
         {
-            return ByteNBT.valueOf(value);
+            return new ByteNBT(value ? (byte) 1 : (byte) 0);
         }
 
         @Override
@@ -57,7 +57,7 @@ public class Serializers
         @Override
         public INBT write(Byte value)
         {
-            return ByteNBT.valueOf(value);
+            return new ByteNBT(value);
         }
 
         @Override
@@ -84,7 +84,7 @@ public class Serializers
         @Override
         public INBT write(Short value)
         {
-            return ShortNBT.valueOf(value);
+            return new ShortNBT(value);
         }
 
         @Override
@@ -111,7 +111,7 @@ public class Serializers
         @Override
         public INBT write(Integer value)
         {
-            return IntNBT.valueOf(value);
+            return new IntNBT(value);
         }
 
         @Override
@@ -138,7 +138,7 @@ public class Serializers
         @Override
         public INBT write(Long value)
         {
-            return LongNBT.valueOf(value);
+            return new LongNBT(value);
         }
 
         @Override
@@ -165,7 +165,7 @@ public class Serializers
         @Override
         public INBT write(Float value)
         {
-            return FloatNBT.valueOf(value);
+            return new FloatNBT(value);
         }
 
         @Override
@@ -192,7 +192,7 @@ public class Serializers
         @Override
         public INBT write(Double value)
         {
-            return DoubleNBT.valueOf(value);
+            return new DoubleNBT(value);
         }
 
         @Override
@@ -219,7 +219,7 @@ public class Serializers
         @Override
         public INBT write(Character value)
         {
-            return IntNBT.valueOf(value);
+            return new IntNBT(value);
         }
 
         @Override
@@ -246,7 +246,7 @@ public class Serializers
         @Override
         public INBT write(String value)
         {
-            return StringNBT.valueOf(value);
+            return new StringNBT(value);
         }
 
         @Override
@@ -300,7 +300,7 @@ public class Serializers
         @Override
         public INBT write(BlockPos value)
         {
-            return LongNBT.valueOf(value.toLong());
+            return new LongNBT(value.toLong());
         }
 
         @Override
@@ -385,7 +385,7 @@ public class Serializers
         @Override
         public INBT write(ResourceLocation value)
         {
-            return StringNBT.valueOf(value.toString());
+            return new StringNBT(value.toString());
         }
 
         @Override
