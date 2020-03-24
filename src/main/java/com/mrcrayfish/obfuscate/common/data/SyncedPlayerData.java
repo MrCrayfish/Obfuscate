@@ -10,6 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -184,7 +185,12 @@ public class SyncedPlayerData
             DataHolder holder = this.getDataHolder(player);
             if(holder != null)
             {
-                PacketHandler.getPlayChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) event.getPlayer()), new MessageSyncPlayerData(player.getEntityId(), holder, true));
+                List<SyncedPlayerData.DataEntry<?>> entries = holder.gatherAll();
+                entries.removeIf(entry -> !entry.getKey().shouldSyncToAllPlayers());
+                if(!entries.isEmpty())
+                {
+                    PacketHandler.getPlayChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) event.getPlayer()), new MessageSyncPlayerData(player.getEntityId(), entries));
+                }
             }
         }
     }
@@ -199,7 +205,11 @@ public class SyncedPlayerData
             DataHolder holder = this.getDataHolder(player);
             if(holder != null)
             {
-                PacketHandler.getPlayChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), new MessageSyncPlayerData(player.getEntityId(), holder, true));
+                List<SyncedPlayerData.DataEntry<?>> entries = holder.gatherAll();
+                if(!entries.isEmpty())
+                {
+                    PacketHandler.getPlayChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), new MessageSyncPlayerData(player.getEntityId(), entries));
+                }
             }
         }
     }
@@ -217,7 +227,12 @@ public class SyncedPlayerData
                 DataHolder newHolder = this.getDataHolder(player);
                 if(newHolder != null)
                 {
-                    newHolder.dataMap = new HashMap<>(oldHolder.dataMap);
+                    Map<SyncedDataKey<?>, DataEntry<?>> dataMap = new HashMap<>(oldHolder.dataMap);
+                    if(event.isWasDeath())
+                    {
+                        dataMap.entrySet().removeIf(entry -> !entry.getKey().isPersistent());
+                    }
+                    newHolder.dataMap = dataMap;
                 }
             }
         }
@@ -236,7 +251,16 @@ public class SyncedPlayerData
                     DataHolder holder = this.getDataHolder(player);
                     if(holder != null && holder.isDirty())
                     {
-                        PacketHandler.getPlayChannel().send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new MessageSyncPlayerData(player.getEntityId(), holder, false));
+                        List<SyncedPlayerData.DataEntry<?>> entries = holder.gatherDirty();
+                        if(!entries.isEmpty())
+                        {
+                            PacketHandler.getPlayChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), new MessageSyncPlayerData(player.getEntityId(), entries));
+                            List<SyncedPlayerData.DataEntry<?>> syncToAllEntries = entries.stream().filter(entry -> entry.getKey().shouldSyncToAllPlayers()).collect(Collectors.toList());
+                            if(!syncToAllEntries.isEmpty())
+                            {
+                                PacketHandler.getPlayChannel().send(PacketDistributor.TRACKING_ENTITY.with(() -> player), new MessageSyncPlayerData(player.getEntityId(), syncToAllEntries));
+                            }
+                        }
                         holder.clean();
                     }
                 }
@@ -267,7 +291,7 @@ public class SyncedPlayerData
             DataEntry<T> entry = (DataEntry<T>) this.dataMap.computeIfAbsent(key, DataEntry::new);
             if(!entry.getValue().equals(value))
             {
-                boolean dirty = !player.world.isRemote;
+                boolean dirty = !player.world.isRemote && entry.getKey().shouldSyncToClient();
                 entry.setValue(value, dirty);
                 this.dirty = dirty;
                 return true;
@@ -295,12 +319,12 @@ public class SyncedPlayerData
 
         public List<DataEntry<?>> gatherDirty()
         {
-            return this.dataMap.values().stream().filter(DataEntry::isDirty).collect(Collectors.toList());
+            return this.dataMap.values().stream().filter(DataEntry::isDirty).filter(entry -> entry.getKey().shouldSyncToClient()).collect(Collectors.toList());
         }
 
         public List<DataEntry<?>> gatherAll()
         {
-            return new ArrayList<>(this.dataMap.values());
+            return this.dataMap.values().stream().filter(entry -> entry.getKey().shouldSyncToClient()).collect(Collectors.toList());
         }
     }
 
@@ -361,6 +385,16 @@ public class SyncedPlayerData
         {
             this.value = this.getKey().getSerializer().read(buffer);
         }
+
+        private INBT writeValue()
+        {
+            return this.key.getSerializer().write(this.value);
+        }
+
+        private void readValue(INBT nbt)
+        {
+            this.value = this.key.getSerializer().read(nbt);
+        }
     }
 
     public boolean updateMappings(HandshakeMessages.S2CSyncedPlayerData message)
@@ -384,28 +418,52 @@ public class SyncedPlayerData
         @Override
         public INBT writeNBT(Capability<DataHolder> capability, DataHolder instance, Direction side)
         {
-            return new CompoundNBT();
+            ListNBT list = new ListNBT();
+            instance.dataMap.forEach((key, entry) ->
+            {
+                if(key.shouldSave())
+                {
+                    CompoundNBT keyTag = new CompoundNBT();
+                    keyTag.putString("Key", key.getKey().toString());
+                    keyTag.put("Value", entry.writeValue());
+                    list.add(keyTag);
+                }
+            });
+            return list;
         }
 
         @Override
         public void readNBT(Capability<DataHolder> capability, DataHolder instance, Direction side, INBT nbt)
         {
-
+            ListNBT list = (ListNBT) nbt;
+            list.forEach(entryTag ->
+            {
+                CompoundNBT keyTag = (CompoundNBT) entryTag;
+                ResourceLocation key = ResourceLocation.tryCreate(keyTag.getString("Key"));
+                INBT value = keyTag.get("Value");
+                SyncedDataKey<?> syncedDataKey = SyncedPlayerData.instance().registeredDataKeys.get(key);
+                if(syncedDataKey != null && syncedDataKey.shouldSave())
+                {
+                    DataEntry<?> entry = new DataEntry<>(syncedDataKey);
+                    entry.readValue(value);
+                    instance.dataMap.put(syncedDataKey, entry);
+                }
+            });
         }
     }
 
-    public static class Provider implements ICapabilitySerializable<CompoundNBT>
+    public static class Provider implements ICapabilitySerializable<ListNBT>
     {
         final DataHolder INSTANCE = CAPABILITY.getDefaultInstance();
 
         @Override
-        public CompoundNBT serializeNBT()
+        public ListNBT serializeNBT()
         {
-            return (CompoundNBT) CAPABILITY.getStorage().writeNBT(CAPABILITY, INSTANCE, null);
+            return (ListNBT) CAPABILITY.getStorage().writeNBT(CAPABILITY, INSTANCE, null);
         }
 
         @Override
-        public void deserializeNBT(CompoundNBT compound)
+        public void deserializeNBT(ListNBT compound)
         {
             CAPABILITY.getStorage().readNBT(CAPABILITY, INSTANCE, null, compound);
         }

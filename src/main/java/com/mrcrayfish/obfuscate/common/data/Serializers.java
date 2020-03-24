@@ -1,7 +1,7 @@
 package com.mrcrayfish.obfuscate.common.data;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.*;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -26,6 +26,18 @@ public class Serializers
         {
             return buf.readBoolean();
         }
+
+        @Override
+        public INBT write(Boolean value)
+        {
+            return ByteNBT.valueOf(value);
+        }
+
+        @Override
+        public Boolean read(INBT nbt)
+        {
+            return ((ByteNBT) nbt).getByte() != 0;
+        }
     };
 
     public static final IDataSerializer<Byte> BYTE = new IDataSerializer<Byte>()
@@ -40,6 +52,18 @@ public class Serializers
         public Byte read(PacketBuffer buf)
         {
             return buf.readByte();
+        }
+
+        @Override
+        public INBT write(Byte value)
+        {
+            return ByteNBT.valueOf(value);
+        }
+
+        @Override
+        public Byte read(INBT nbt)
+        {
+            return ((ByteNBT) nbt).getByte();
         }
     };
 
@@ -56,6 +80,18 @@ public class Serializers
         {
             return buf.readShort();
         }
+
+        @Override
+        public INBT write(Short value)
+        {
+            return ShortNBT.valueOf(value);
+        }
+
+        @Override
+        public Short read(INBT nbt)
+        {
+            return ((ShortNBT) nbt).getShort();
+        }
     };
 
     public static final IDataSerializer<Integer> INTEGER = new IDataSerializer<Integer>()
@@ -70,6 +106,18 @@ public class Serializers
         public Integer read(PacketBuffer buf)
         {
             return buf.readVarInt();
+        }
+
+        @Override
+        public INBT write(Integer value)
+        {
+            return IntNBT.valueOf(value);
+        }
+
+        @Override
+        public Integer read(INBT nbt)
+        {
+            return ((IntNBT) nbt).getInt();
         }
     };
 
@@ -86,6 +134,18 @@ public class Serializers
         {
             return buf.readLong();
         }
+
+        @Override
+        public INBT write(Long value)
+        {
+            return LongNBT.valueOf(value);
+        }
+
+        @Override
+        public Long read(INBT nbt)
+        {
+            return ((LongNBT) nbt).getLong();
+        }
     };
 
     public static final IDataSerializer<Float> FLOAT = new IDataSerializer<Float>()
@@ -100,6 +160,18 @@ public class Serializers
         public Float read(PacketBuffer buf)
         {
             return buf.readFloat();
+        }
+
+        @Override
+        public INBT write(Float value)
+        {
+            return FloatNBT.valueOf(value);
+        }
+
+        @Override
+        public Float read(INBT nbt)
+        {
+            return ((FloatNBT) nbt).getFloat();
         }
     };
 
@@ -116,6 +188,18 @@ public class Serializers
         {
             return buf.readDouble();
         }
+
+        @Override
+        public INBT write(Double value)
+        {
+            return DoubleNBT.valueOf(value);
+        }
+
+        @Override
+        public Double read(INBT nbt)
+        {
+            return ((DoubleNBT) nbt).getDouble();
+        }
     };
 
     public static final IDataSerializer<Character> CHARACTER = new IDataSerializer<Character>()
@@ -130,6 +214,18 @@ public class Serializers
         public Character read(PacketBuffer buf)
         {
             return buf.readChar();
+        }
+
+        @Override
+        public INBT write(Character value)
+        {
+            return IntNBT.valueOf(value);
+        }
+
+        @Override
+        public Character read(INBT nbt)
+        {
+            return (char) ((IntNBT) nbt).getInt();
         }
     };
 
@@ -146,6 +242,18 @@ public class Serializers
         {
             return buf.readString();
         }
+
+        @Override
+        public INBT write(String value)
+        {
+            return StringNBT.valueOf(value);
+        }
+
+        @Override
+        public String read(INBT nbt)
+        {
+            return nbt.getString();
+        }
     };
 
     public static final IDataSerializer<CompoundNBT> TAG_COMPOUND = new IDataSerializer<CompoundNBT>()
@@ -160,6 +268,18 @@ public class Serializers
         public CompoundNBT read(PacketBuffer buf)
         {
             return buf.readCompoundTag();
+        }
+
+        @Override
+        public INBT write(CompoundNBT value)
+        {
+            return value;
+        }
+
+        @Override
+        public CompoundNBT read(INBT nbt)
+        {
+            return (CompoundNBT) nbt;
         }
     };
 
@@ -176,6 +296,18 @@ public class Serializers
         {
             return buf.readBlockPos();
         }
+
+        @Override
+        public INBT write(BlockPos value)
+        {
+            return LongNBT.valueOf(value.toLong());
+        }
+
+        @Override
+        public BlockPos read(INBT nbt)
+        {
+            return BlockPos.fromLong(((LongNBT) nbt).getLong());
+        }
     };
 
     public static final IDataSerializer<UUID> UUID = new IDataSerializer<UUID>()
@@ -190,6 +322,22 @@ public class Serializers
         public UUID read(PacketBuffer buf)
         {
             return buf.readUniqueId();
+        }
+
+        @Override
+        public INBT write(UUID value)
+        {
+            CompoundNBT compound = new CompoundNBT();
+            compound.putLong("Most", value.getMostSignificantBits());
+            compound.putLong("Least", value.getLeastSignificantBits());
+            return compound;
+        }
+
+        @Override
+        public UUID read(INBT nbt)
+        {
+            CompoundNBT compound = new CompoundNBT();
+            return new UUID(compound.getLong("Most"), compound.getLong("Least"));
         }
     };
 
@@ -206,6 +354,18 @@ public class Serializers
         {
             return buf.readItemStack();
         }
+
+        @Override
+        public INBT write(ItemStack value)
+        {
+            return value.write(new CompoundNBT());
+        }
+
+        @Override
+        public ItemStack read(INBT nbt)
+        {
+            return ItemStack.read((CompoundNBT) nbt);
+        }
     };
 
     public static final IDataSerializer<ResourceLocation> RESOURCE_LOCATION = new IDataSerializer<ResourceLocation>()
@@ -220,6 +380,18 @@ public class Serializers
         public ResourceLocation read(PacketBuffer buf)
         {
             return buf.readResourceLocation();
+        }
+
+        @Override
+        public INBT write(ResourceLocation value)
+        {
+            return StringNBT.valueOf(value.toString());
+        }
+
+        @Override
+        public ResourceLocation read(INBT nbt)
+        {
+            return ResourceLocation.tryCreate(nbt.getString());
         }
     };
 }
