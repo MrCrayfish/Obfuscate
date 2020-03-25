@@ -1,9 +1,11 @@
 package com.mrcrayfish.obfuscate.proxy;
 
+import com.mrcrayfish.obfuscate.Obfuscate;
 import com.mrcrayfish.obfuscate.client.model.CustomModelPlayer;
 import com.mrcrayfish.obfuscate.client.model.ModelBipedArmor;
 import com.mrcrayfish.obfuscate.client.model.layer.LayerCustomHeldItem;
 import com.mrcrayfish.obfuscate.client.renderer.entity.RenderCustomEntityItem;
+import com.mrcrayfish.obfuscate.common.data.SyncedPlayerData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.model.ModelBiped;
@@ -11,8 +13,11 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.*;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
@@ -63,5 +68,25 @@ public class ClientProxy extends CommonProxy
     {
         ObfuscationReflectionHelper.setPrivateValue(LayerArmorBase.class, layerBipedArmor, new ModelBipedArmor(source, 1.0F), "field_177186_d");
         ObfuscationReflectionHelper.setPrivateValue(LayerArmorBase.class, layerBipedArmor, new ModelBipedArmor(source, 0.5F), "field_177189_c");
+    }
+
+    @Override
+    public void updatePlayerData(int entityId, List<SyncedPlayerData.DataEntry<?>> entries)
+    {
+        World world = Minecraft.getMinecraft().world;
+        if(world != null)
+        {
+            Entity entity = world.getEntityByID(entityId);
+            if(entity instanceof EntityPlayer)
+            {
+                EntityPlayer player = (EntityPlayer) entity;
+                entries.forEach(entry -> this.setSyncedValue(player, entry));
+            }
+        }
+    }
+
+    private <T> void setSyncedValue(EntityPlayer player, SyncedPlayerData.DataEntry<T> entry)
+    {
+        SyncedPlayerData.instance().set(player, entry.getKey(), entry.getValue());
     }
 }

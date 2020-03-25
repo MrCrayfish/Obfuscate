@@ -3,11 +3,12 @@ package com.mrcrayfish.obfuscate;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.mrcrayfish.obfuscate.common.data.SyncedPlayerData;
+import com.mrcrayfish.obfuscate.network.PacketHandler;
 import com.mrcrayfish.obfuscate.proxy.CommonProxy;
 import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.event.FMLConstructionEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
@@ -18,7 +19,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class Obfuscate extends DummyModContainer
 {
-    public static Logger LOGGER = LogManager.getLogger("Obfuscate");
+    public static final Logger LOGGER = LogManager.getLogger("Obfuscate");
 
     public static CommonProxy proxy;
 
@@ -63,12 +64,15 @@ public class Obfuscate extends DummyModContainer
         {
             e.printStackTrace();
         }
+
+        PacketHandler.register(event.getSide());
     }
 
     @Subscribe
     public void preInit(FMLPreInitializationEvent event)
     {
         proxy.preInit();
+        SyncedPlayerData.init();
     }
 
     @Subscribe
