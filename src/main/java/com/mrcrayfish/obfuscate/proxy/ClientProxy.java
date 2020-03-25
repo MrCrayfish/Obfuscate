@@ -73,7 +73,6 @@ public class ClientProxy extends CommonProxy
             {
                 PlayerEntity player = (PlayerEntity) entity;
                 entries.forEach(entry -> this.setSyncedValue(player, entry));
-                Obfuscate.LOGGER.info("Updating synced data...");
             }
         }
     }
