@@ -17,9 +17,8 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -30,9 +29,12 @@ import org.apache.commons.lang3.Validate;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 /**
@@ -60,7 +62,6 @@ import java.util.stream.Collectors;
  */
 public class SyncedPlayerData
 {
-    @CapabilityInject(DataHolder.class)
     public static final Capability<DataHolder> CAPABILITY = null;
 
     private static SyncedPlayerData instance;
@@ -86,9 +87,31 @@ public class SyncedPlayerData
     {
         if(!init)
         {
-            CapabilityManager.INSTANCE.register(DataHolder.class, new Storage(), DataHolder::new);
+            injectCapability();
             MinecraftForge.EVENT_BUS.register(instance());
             init = true;
+        }
+    }
+
+    /* Injects the capability manually because Forge won't discover annotations in core mods when in
+     * an obfuscated environment. This is definitely not endorsed but it works! */
+    @SuppressWarnings("unchecked")
+    private static void injectCapability()
+    {
+        try
+        {
+            String realName = DataHolder.class.getName().intern();
+            Constructor<Capability> constructor = Capability.class.getDeclaredConstructor(String.class, Capability.IStorage.class, Callable.class);
+            constructor.setAccessible(true);
+            Capability<DataHolder> cap = constructor.newInstance(realName, new Storage(), (Callable<DataHolder>) () -> new DataHolder());
+            Field field = SyncedPlayerData.class.getDeclaredField("CAPABILITY");
+            EnumHelper.setFailsafeFieldValue(field, null, cap);
+            Obfuscate.LOGGER.info("Successfully injected SyncedPlayerData capability");
+        }
+        catch(Exception e)
+        {
+            Obfuscate.LOGGER.fatal("Failed to initialize capability!");
+            e.printStackTrace();
         }
     }
 
