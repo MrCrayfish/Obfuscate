@@ -104,7 +104,6 @@ function patch_LivingRenderer_func_225623_a_(method) {
             continue;
         if(!node1.name.equals(ASMAPI.mapMethod("func_225598_a_")))
             continue;
-        print(node1.getPrevious().getOpcode())
         if(node1.getPrevious().getOpcode() != -1)
             continue;
         endNode = node1.getNext();
@@ -141,20 +140,6 @@ function patch_LivingRenderer_func_225623_a_(method) {
         method.instructions.insertBefore(endNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/obfuscate/client/Hooks", "fireRenderPlayerPost", "(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/model/EntityModel;Lcom/mojang/blaze3d/matrix/MatrixStack;Lcom/mojang/blaze3d/vertex/IVertexBuilder;IIFFFFF)V", false));
 
         print("[obfuscate] Successfully patched LivingRenderer#func_225623_a_");
-
-
-        for(var k = 0; k < method.instructions.size(); k++)
-        {
-            var node2 = method.instructions.get(k);
-            if(node2 instanceof VarInsnNode)
-            {
-                print("var insn " + node2.getOpcode() + " " + node2.var);
-            }
-            else
-            {
-                print(node2.getOpcode());
-            }
-        }
         return;
     }
     print("[obfuscate] Failed to patch LivingRenderer#func_225623_a_");
