@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.entity.model.IHasArm;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.HandSide;
@@ -58,10 +59,10 @@ public class CustomHeldItemLayer<T extends LivingEntity, M extends EntityModel<T
             matrixStack.rotate(Vector3f.field_229181_d_.func_229187_a_(180.0F));
             boolean leftHanded = handSide == HandSide.LEFT;
             matrixStack.translate((double) ((float) (leftHanded ? -1 : 1) / 16.0F), 0.125D, -0.625D);
-            if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held.Pre(entity, stack, transformType, matrixStack, renderTypeBuffer, handSide, partialTicks)))
+            if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held.Pre(entity, stack, transformType, matrixStack, renderTypeBuffer, handSide, light, OverlayTexture.DEFAULT_LIGHT, partialTicks)))
             {
                 Minecraft.getInstance().getFirstPersonRenderer().renderItemSide(entity, stack, transformType, leftHanded, matrixStack, renderTypeBuffer, light);
-                MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held.Post(entity, stack, transformType, matrixStack, renderTypeBuffer, handSide, partialTicks));
+                MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held.Post(entity, stack, transformType, matrixStack, renderTypeBuffer, handSide, light, OverlayTexture.DEFAULT_LIGHT, partialTicks));
             }
             matrixStack.pop();
         }

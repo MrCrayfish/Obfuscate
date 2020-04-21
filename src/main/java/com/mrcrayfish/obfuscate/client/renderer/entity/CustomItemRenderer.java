@@ -77,11 +77,11 @@ public class CustomItemRenderer extends ItemRenderer
                 }
             }
 
-            boolean cancelled = MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Pre(entity, stack, matrixStack, buffer, partialTicks));
+            boolean cancelled = MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Pre(entity, stack, matrixStack, buffer, light, OverlayTexture.DEFAULT_LIGHT, partialTicks));
             if(!cancelled)
             {
                 this.itemRenderer.func_229111_a_(stack, ItemCameraTransforms.TransformType.GROUND, false, matrixStack, buffer, light, OverlayTexture.DEFAULT_LIGHT, model);
-                MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Post(entity, stack, matrixStack, buffer, partialTicks));
+                MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Post(entity, stack, matrixStack, buffer, light, OverlayTexture.DEFAULT_LIGHT, partialTicks));
             }
             matrixStack.pop();
 

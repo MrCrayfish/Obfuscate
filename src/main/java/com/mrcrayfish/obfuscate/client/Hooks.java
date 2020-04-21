@@ -18,30 +18,30 @@ import net.minecraftforge.common.MinecraftForge;
  */
 public class Hooks
 {
-    public static boolean fireRenderGuiItemPre(ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer)
+    public static boolean fireRenderGuiItemPre(ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay)
     {
-        return MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Gui.Pre(heldItem, matrixStack, renderTypeBuffer));
+        return MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Gui.Pre(heldItem, matrixStack, renderTypeBuffer, light, overlay));
     }
 
-    public static void fireRenderGuiItemPost(ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer)
+    public static void fireRenderGuiItemPost(ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay)
     {
-        MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Gui.Post(heldItem, matrixStack, renderTypeBuffer));
+        MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Gui.Post(heldItem, matrixStack, renderTypeBuffer, light, overlay));
     }
 
-    public static boolean fireRenderPlayerPre(LivingEntity entity, EntityModel model, MatrixStack matrixStack, IVertexBuilder builder, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
+    public static boolean fireRenderPlayerPre(LivingEntity entity, EntityModel model, MatrixStack matrixStack, IVertexBuilder builder, int light, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
     {
         if(entity instanceof PlayerEntity)
         {
-            return MinecraftForge.EVENT_BUS.post(new PlayerModelEvent.Render.Pre((PlayerEntity) entity, (PlayerModel) model, matrixStack, builder, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, Minecraft.getInstance().getRenderPartialTicks()));
+            return MinecraftForge.EVENT_BUS.post(new PlayerModelEvent.Render.Pre((PlayerEntity) entity, (PlayerModel) model, matrixStack, builder, light, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, Minecraft.getInstance().getRenderPartialTicks()));
         }
         return false;
     }
 
-    public static void fireRenderPlayerPost(LivingEntity entity, EntityModel model, MatrixStack matrixStack, IVertexBuilder builder, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
+    public static void fireRenderPlayerPost(LivingEntity entity, EntityModel model, MatrixStack matrixStack, IVertexBuilder builder, int light, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
     {
         if(entity instanceof PlayerEntity)
         {
-            MinecraftForge.EVENT_BUS.post(new PlayerModelEvent.Render.Post((PlayerEntity) entity, (PlayerModel) model, matrixStack, builder, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, Minecraft.getInstance().getRenderPartialTicks()));
+            MinecraftForge.EVENT_BUS.post(new PlayerModelEvent.Render.Post((PlayerEntity) entity, (PlayerModel) model, matrixStack, builder, light, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, Minecraft.getInstance().getRenderPartialTicks()));
         }
     }
 }

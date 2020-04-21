@@ -103,27 +103,29 @@ public abstract class PlayerModelEvent extends PlayerEvent
     {
         private MatrixStack matrixStack;
         private IVertexBuilder builder;
+        private int light;
 
-        private Render(PlayerEntity player, PlayerModel modelPlayer, MatrixStack matrixStack, IVertexBuilder builder, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float partialTicks)
+        private Render(PlayerEntity player, PlayerModel modelPlayer, MatrixStack matrixStack, IVertexBuilder builder, int light, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float partialTicks)
         {
             super(player, modelPlayer, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, partialTicks);
             this.matrixStack = matrixStack;
             this.builder = builder;
+            this.light = light;
         }
 
         public static class Pre extends Render
         {
-            public Pre(PlayerEntity player, PlayerModel modelPlayer, MatrixStack matrixStack, IVertexBuilder builder, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float partialTicks)
+            public Pre(PlayerEntity player, PlayerModel modelPlayer, MatrixStack matrixStack, IVertexBuilder builder, int light, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float partialTicks)
             {
-                super(player, modelPlayer, matrixStack, builder, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, partialTicks);
+                super(player, modelPlayer, matrixStack, builder, light, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, partialTicks);
             }
         }
 
         public static class Post extends Render
         {
-            public Post(PlayerEntity player, PlayerModel modelPlayer, MatrixStack matrixStack, IVertexBuilder builder, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float partialTicks)
+            public Post(PlayerEntity player, PlayerModel modelPlayer, MatrixStack matrixStack, IVertexBuilder builder, int light, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float partialTicks)
             {
-                super(player, modelPlayer, matrixStack, builder, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, partialTicks);
+                super(player, modelPlayer, matrixStack, builder, light, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, partialTicks);
             }
 
             @Override
@@ -141,6 +143,11 @@ public abstract class PlayerModelEvent extends PlayerEvent
         public IVertexBuilder getBuilder()
         {
             return builder;
+        }
+
+        public int getLight()
+        {
+            return light;
         }
     }
 }
