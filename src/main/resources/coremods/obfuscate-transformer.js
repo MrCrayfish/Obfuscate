@@ -104,38 +104,57 @@ function patch_LivingRenderer_func_225623_a_(method) {
             continue;
         if(!node1.name.equals(ASMAPI.mapMethod("func_225598_a_")))
             continue;
+        print(node1.getPrevious().getOpcode())
+        if(node1.getPrevious().getOpcode() != -1)
+            continue;
         endNode = node1.getNext();
         break;
     }
     if(startNode !== null && endNode !== null) {
         method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ALOAD, 1));
         method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ALOAD, 0));
-        method.instructions.insertBefore(startNode, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/entity/LivingRenderer", ASMAPI.mapField("field_77045_g"), "Lnet/minecraft/client/renderer/entity/model/EntityModel;"))
+        method.instructions.insertBefore(startNode, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/entity/LivingRenderer", ASMAPI.mapField("field_77045_g"), "Lnet/minecraft/client/renderer/entity/model/EntityModel;"));
         method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ALOAD, 4));
         method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ALOAD, 5));
+        method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ILOAD, 6));
         method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ILOAD, 19));
         method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.FLOAD, 14));
         method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.FLOAD, 13));
         method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.FLOAD, 12));
         method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.FLOAD, 10));
         method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.FLOAD, 11));
-        method.instructions.insertBefore(startNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/obfuscate/client/Hooks", "fireRenderPlayerPre", "(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/model/EntityModel;Lcom/mojang/blaze3d/matrix/MatrixStack;Lcom/mojang/blaze3d/vertex/IVertexBuilder;IFFFFF)Z", false));
+        method.instructions.insertBefore(startNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/obfuscate/client/Hooks", "fireRenderPlayerPre", "(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/model/EntityModel;Lcom/mojang/blaze3d/matrix/MatrixStack;Lcom/mojang/blaze3d/vertex/IVertexBuilder;IIFFFFF)Z", false));
         method.instructions.insertBefore(startNode, new JumpInsnNode(Opcodes.IFNE, endNode));
 
         method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.ALOAD, 1));
         method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.ALOAD, 0));
-        method.instructions.insertBefore(endNode, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/entity/LivingRenderer", ASMAPI.mapField("field_77045_g"), "Lnet/minecraft/client/renderer/entity/model/EntityModel;"))
+        method.instructions.insertBefore(endNode, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/entity/LivingRenderer", ASMAPI.mapField("field_77045_g"), "Lnet/minecraft/client/renderer/entity/model/EntityModel;"));
         method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.ALOAD, 4));
         method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.ALOAD, 5));
+        method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.ILOAD, 6));
         method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.ILOAD, 19));
         method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.FLOAD, 14));
         method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.FLOAD, 13));
         method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.FLOAD, 12));
         method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.FLOAD, 10));
         method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.FLOAD, 11));
-        method.instructions.insertBefore(endNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/obfuscate/client/Hooks", "fireRenderPlayerPost", "(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/model/EntityModel;Lcom/mojang/blaze3d/matrix/MatrixStack;Lcom/mojang/blaze3d/vertex/IVertexBuilder;IFFFFF)V", false));
+        method.instructions.insertBefore(endNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/obfuscate/client/Hooks", "fireRenderPlayerPost", "(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/model/EntityModel;Lcom/mojang/blaze3d/matrix/MatrixStack;Lcom/mojang/blaze3d/vertex/IVertexBuilder;IIFFFFF)V", false));
 
         print("[obfuscate] Successfully patched LivingRenderer#func_225623_a_");
+
+
+        for(var k = 0; k < method.instructions.size(); k++)
+        {
+            var node2 = method.instructions.get(k);
+            if(node2 instanceof VarInsnNode)
+            {
+                print("var insn " + node2.getOpcode() + " " + node2.var);
+            }
+            else
+            {
+                print(node2.getOpcode());
+            }
+        }
         return;
     }
     print("[obfuscate] Failed to patch LivingRenderer#func_225623_a_");
