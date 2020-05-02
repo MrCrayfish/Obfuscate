@@ -92,6 +92,5 @@ public class CustomItemRenderer extends ItemRenderer
         }
 
         matrixStack.pop();
-        super.render(entity, p_225623_2_, partialTicks, matrixStack, buffer, light);
     }
 }
