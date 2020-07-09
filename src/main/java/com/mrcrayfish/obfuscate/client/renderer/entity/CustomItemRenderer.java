@@ -3,7 +3,6 @@ package com.mrcrayfish.obfuscate.client.renderer.entity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mrcrayfish.obfuscate.client.event.RenderItemEvent;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.model.IBakedModel;
@@ -13,6 +12,7 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -48,7 +48,7 @@ public class CustomItemRenderer extends ItemRenderer
         float yScale = model.getItemCameraTransforms().getTransform(ItemCameraTransforms.TransformType.GROUND).scale.getY();
         matrixStack.translate(0.0D, (double) (bobOffset + 0.25F * yScale), 0.0D);
         float rotation = ((float) entity.getAge() + partialTicks) / 20.0F + entity.hoverStart;
-        matrixStack.rotate(Vector3f.field_229181_d_.func_229193_c_(rotation));
+        matrixStack.rotate(Vector3f.YP.rotation(rotation));
         if(!isGui3d)
         {
             float x = -0.0F * (float) (modelCount - 1) * 0.5F;
@@ -77,11 +77,11 @@ public class CustomItemRenderer extends ItemRenderer
                 }
             }
 
-            boolean cancelled = MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Pre(entity, stack, matrixStack, buffer, light, OverlayTexture.DEFAULT_LIGHT, partialTicks));
+            boolean cancelled = MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Pre(entity, stack, matrixStack, buffer, light, OverlayTexture.NO_OVERLAY, partialTicks));
             if(!cancelled)
             {
-                this.itemRenderer.func_229111_a_(stack, ItemCameraTransforms.TransformType.GROUND, false, matrixStack, buffer, light, OverlayTexture.DEFAULT_LIGHT, model);
-                MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Post(entity, stack, matrixStack, buffer, light, OverlayTexture.DEFAULT_LIGHT, partialTicks));
+                this.itemRenderer.renderItem(stack, ItemCameraTransforms.TransformType.GROUND, false, matrixStack, buffer, light, OverlayTexture.NO_OVERLAY, model);
+                MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Post(entity, stack, matrixStack, buffer, light, OverlayTexture.NO_OVERLAY, partialTicks));
             }
             matrixStack.pop();
 

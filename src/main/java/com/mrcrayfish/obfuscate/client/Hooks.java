@@ -21,12 +21,12 @@ public class Hooks
 {
     public static boolean fireRenderGuiItemPre(ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer)
     {
-        return MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Gui.Pre(heldItem, matrixStack, renderTypeBuffer, 15728880, OverlayTexture.DEFAULT_LIGHT));
+        return MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Gui.Pre(heldItem, matrixStack, renderTypeBuffer, 15728880, OverlayTexture.NO_OVERLAY));
     }
 
     public static void fireRenderGuiItemPost(ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer)
     {
-        MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Gui.Post(heldItem, matrixStack, renderTypeBuffer, 15728880, OverlayTexture.DEFAULT_LIGHT));
+        MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Gui.Post(heldItem, matrixStack, renderTypeBuffer, 15728880, OverlayTexture.NO_OVERLAY));
     }
 
     public static boolean fireRenderPlayerPre(LivingEntity entity, EntityModel model, MatrixStack matrixStack, IVertexBuilder builder, int light, int overlay, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)

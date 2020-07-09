@@ -20,15 +20,13 @@ public class CustomPlayerModel extends PlayerModel<AbstractClientPlayerEntity>
         this.smallArms = smallArmsIn;
     }
 
-    //func_225597_a_
-
     @Override
-    public void render(AbstractClientPlayerEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
+    public void setRotationAngles(AbstractClientPlayerEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
     {
         this.resetRotationAngles();
         if(!MinecraftForge.EVENT_BUS.post(new PlayerModelEvent.SetupAngles.Pre(entityIn, this, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, Minecraft.getInstance().getRenderPartialTicks())))
         {
-            super.render(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+            super.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
             MinecraftForge.EVENT_BUS.post(new PlayerModelEvent.SetupAngles.Post(entityIn, this, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, Minecraft.getInstance().getRenderPartialTicks()));
         }
         this.setupRotationAngles();
