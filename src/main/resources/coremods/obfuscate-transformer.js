@@ -110,13 +110,13 @@ function patch_LivingRenderer_func_225623_a_(method) {
         break;
     }
     if(startNode !== null && endNode !== null) {
-        method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ALOAD, 1));
-        method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ALOAD, 0));
+        method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ALOAD, 1));  // entityIn
+        method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ALOAD, 0));  // this
         method.instructions.insertBefore(startNode, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/entity/LivingRenderer", ASMAPI.mapField("field_77045_g"), "Lnet/minecraft/client/renderer/entity/model/EntityModel;"));
-        method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ALOAD, 4));
-        method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ALOAD, 5));
-        method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ILOAD, 6));
-        method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ILOAD, 19));
+        method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ALOAD, 4));  // MatrixStack
+        method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ALOAD, 20)); // IVertexBuilder
+        method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ILOAD, 6));  // Light
+        method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.ILOAD, 21)); // Packed Overlay
         method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.FLOAD, 14));
         method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.FLOAD, 13));
         method.instructions.insertBefore(startNode, new VarInsnNode(Opcodes.FLOAD, 12));
@@ -129,9 +129,9 @@ function patch_LivingRenderer_func_225623_a_(method) {
         method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.ALOAD, 0));
         method.instructions.insertBefore(endNode, new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/entity/LivingRenderer", ASMAPI.mapField("field_77045_g"), "Lnet/minecraft/client/renderer/entity/model/EntityModel;"));
         method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.ALOAD, 4));
-        method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.ALOAD, 5));
+        method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.ALOAD, 20));
         method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.ILOAD, 6));
-        method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.ILOAD, 19));
+        method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.ILOAD, 21));
         method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.FLOAD, 14));
         method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.FLOAD, 13));
         method.instructions.insertBefore(endNode, new VarInsnNode(Opcodes.FLOAD, 12));

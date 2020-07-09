@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[30,)"
+loaderVersion="[32,)"
 
 [[mods]]
 modId="obfuscate"
@@ -15,12 +15,12 @@ description="A simple library that adds in useful events"
 [[dependencies.obfuscate]]
     modId="forge"
     mandatory=true
-    versionRange="[30.0.17,)"
+    versionRange="[32.0.61,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.obfuscate]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.15,1.16)"
+    versionRange="[1.16,1.17)"
     ordering="NONE"
     side="BOTH"
