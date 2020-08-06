@@ -38,7 +38,7 @@ public class PacketHandler
             .loginIndex(HandshakeMessages.LoginIndexedMessage::getLoginIndex, HandshakeMessages.LoginIndexedMessage::setLoginIndex)
             .decoder(HandshakeMessages.S2CSyncedPlayerData::decode)
             .encoder(HandshakeMessages.S2CSyncedPlayerData::encode)
-            .consumer(FMLHandshakeHandler.indexFirst((handler, msg, supplier) -> HandshakeHandler.handleSyncedPlayerData(msg, supplier)))
+            .consumer(FMLHandshakeHandler.biConsumerFor((handler, msg, supplier) -> HandshakeHandler.handleSyncedPlayerData(msg, supplier)))
             .markAsLoginPacket()
             .add();
 
