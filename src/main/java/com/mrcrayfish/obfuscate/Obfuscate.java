@@ -20,7 +20,7 @@ public class Obfuscate
 {
     public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_NAME);
 
-    public static final CommonProxy PROXY = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
+    public static final CommonProxy PROXY = DistExecutor.unsafeRunForDist(() -> ClientProxy::new, () -> CommonProxy::new);
 
     public Obfuscate()
     {
