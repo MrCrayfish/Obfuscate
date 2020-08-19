@@ -57,7 +57,7 @@ public class PacketHandler
         playChannel.registerMessage(nextId++, clazz, message::encode, message::decode, message::handle);
     }
 
-    public static SimpleChannel getHandshakeChannel()
+    static SimpleChannel getHandshakeChannel()
     {
         return handshakeChannel;
     }

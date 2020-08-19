@@ -1,10 +1,8 @@
 package com.mrcrayfish.obfuscate;
 
+import com.mrcrayfish.obfuscate.client.ClientHandler;
 import com.mrcrayfish.obfuscate.common.data.SyncedPlayerData;
 import com.mrcrayfish.obfuscate.network.PacketHandler;
-import com.mrcrayfish.obfuscate.proxy.ClientProxy;
-import com.mrcrayfish.obfuscate.proxy.CommonProxy;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -20,8 +18,6 @@ public class Obfuscate
 {
     public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_NAME);
 
-    public static final CommonProxy PROXY = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
-
     public Obfuscate()
     {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
@@ -36,6 +32,6 @@ public class Obfuscate
 
     private void setupClient(FMLClientSetupEvent event)
     {
-        PROXY.setupClient();
+        ClientHandler.instance().setup();
     }
 }

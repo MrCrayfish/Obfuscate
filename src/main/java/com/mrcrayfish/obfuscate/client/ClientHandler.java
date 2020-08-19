@@ -1,4 +1,4 @@
-package com.mrcrayfish.obfuscate.proxy;
+package com.mrcrayfish.obfuscate.client;
 
 import com.mrcrayfish.obfuscate.Obfuscate;
 import com.mrcrayfish.obfuscate.client.model.CustomBipedModel;
@@ -28,10 +28,22 @@ import java.util.Map;
 /**
  * Author: MrCrayfish
  */
-public class ClientProxy extends CommonProxy
+public class ClientHandler
 {
-    @Override
-    public void setupClient()
+    private static ClientHandler instance;
+
+    public static ClientHandler instance()
+    {
+        if(instance == null)
+        {
+            instance = new ClientHandler();
+        }
+        return instance;
+    }
+
+    private ClientHandler() {}
+
+    public void setup()
     {
         RenderingRegistry.registerEntityRenderingHandler(EntityType.ITEM, manager -> new CustomItemRenderer(manager, Minecraft.getInstance().getItemRenderer()));
         this.patchPlayerModels();
@@ -62,7 +74,6 @@ public class ClientProxy extends CommonProxy
         Obfuscate.LOGGER.info("Patched " + (smallArms ? "slim" : "default") + " model successfully");
     }
 
-    @Override
     public void updatePlayerData(int entityId, List<SyncedPlayerData.DataEntry<?>> entries)
     {
         World world = Minecraft.getInstance().world;

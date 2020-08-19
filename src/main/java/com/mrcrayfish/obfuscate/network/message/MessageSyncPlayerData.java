@@ -1,6 +1,7 @@
 package com.mrcrayfish.obfuscate.network.message;
 
 import com.mrcrayfish.obfuscate.Obfuscate;
+import com.mrcrayfish.obfuscate.client.ClientHandler;
 import com.mrcrayfish.obfuscate.common.data.SyncedPlayerData;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -52,7 +53,7 @@ public class MessageSyncPlayerData implements IMessage<MessageSyncPlayerData>
     {
         if(supplier.get().getDirection() == NetworkDirection.PLAY_TO_CLIENT)
         {
-            supplier.get().enqueueWork(() -> Obfuscate.PROXY.updatePlayerData(message.entityId, message.entries));
+            supplier.get().enqueueWork(() -> ClientHandler.instance().updatePlayerData(message.entityId, message.entries));
             supplier.get().setPacketHandled(true);
         }
     }
