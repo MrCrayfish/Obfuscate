@@ -151,5 +151,10 @@ public abstract class PlayerModelEvent extends PlayerEvent
         {
             return light;
         }
+
+        public int getOverlay()
+        {
+            return overlay;
+        }
     }
 }
