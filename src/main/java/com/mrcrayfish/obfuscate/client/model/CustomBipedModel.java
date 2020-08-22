@@ -1,5 +1,7 @@
 package com.mrcrayfish.obfuscate.client.model;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.entity.LivingEntity;
@@ -18,9 +20,9 @@ public class CustomBipedModel<T extends LivingEntity> extends BipedModel<T>
     }
 
     @Override
-    public void render(T entityIn, float limbSwing, float limbSwingAmount, float somethingToDoWithArmSwing, float headYaw, float headPitch)
+    public void setRotationAngles(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
     {
-        super.render(entityIn, limbSwing, limbSwingAmount, somethingToDoWithArmSwing, headYaw, headPitch);
+        super.setRotationAngles(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
         copyProperties(source.bipedHeadwear, bipedHeadwear);
         copyProperties(source.bipedHead, bipedHead);
         copyProperties(source.bipedBody, bipedBody);
