@@ -38,10 +38,4 @@ public class Obfuscate
     {
         ClientHandler.instance().setup();
     }
-
-    @SubscribeEvent
-    public void onSetupRotation(PlayerModelEvent.SetupAngles.Post event)
-    {
-        event.getModelPlayer().getModelHead().rotateAngleX = (float) Math.toRadians(90f);
-    }
 }
