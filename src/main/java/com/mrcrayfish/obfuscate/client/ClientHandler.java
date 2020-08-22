@@ -79,13 +79,8 @@ public class ClientHandler
             if(entity instanceof PlayerEntity)
             {
                 PlayerEntity player = (PlayerEntity) entity;
-                entries.forEach(entry -> this.setSyncedValue(player, entry));
+                entries.forEach(entry -> SyncedPlayerData.instance().updateClientEntry(player, entry));
             }
         }
-    }
-
-    private <T> void setSyncedValue(PlayerEntity player, SyncedPlayerData.DataEntry<T> entry)
-    {
-        SyncedPlayerData.instance().set(player, entry.getKey(), entry.getValue());
     }
 }

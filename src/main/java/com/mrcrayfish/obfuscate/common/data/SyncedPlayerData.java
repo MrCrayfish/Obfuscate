@@ -14,6 +14,8 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -147,6 +149,12 @@ public class SyncedPlayerData
         }
         DataHolder holder = this.getDataHolder(player);
         return holder != null ? holder.get(key) : key.getDefaultValueSupplier().get();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public <T> void updateClientEntry(PlayerEntity player, SyncedPlayerData.DataEntry<T> entry)
+    {
+        SyncedPlayerData.instance().set(player, entry.getKey(), entry.getValue());
     }
 
     @Nullable
