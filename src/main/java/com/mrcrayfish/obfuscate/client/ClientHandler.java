@@ -3,7 +3,6 @@ package com.mrcrayfish.obfuscate.client;
 import com.mrcrayfish.obfuscate.Obfuscate;
 import com.mrcrayfish.obfuscate.client.model.CustomBipedModel;
 import com.mrcrayfish.obfuscate.client.model.CustomPlayerModel;
-import com.mrcrayfish.obfuscate.client.model.layer.CustomHeldItemLayer;
 import com.mrcrayfish.obfuscate.client.renderer.entity.CustomItemRenderer;
 import com.mrcrayfish.obfuscate.common.data.SyncedPlayerData;
 import net.minecraft.client.Minecraft;
@@ -12,7 +11,6 @@ import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.entity.layers.BipedArmorLayer;
 import net.minecraft.client.renderer.entity.layers.HeadLayer;
-import net.minecraft.client.renderer.entity.layers.HeldItemLayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.entity.Entity;
@@ -64,9 +62,8 @@ public class ClientHandler
         List<LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>> layers = ObfuscationReflectionHelper.getPrivateValue(LivingRenderer.class, player, "field_177097_h");
         if(layers != null)
         {
-            layers.removeIf(layer -> layer instanceof HeldItemLayer || layer instanceof HeadLayer || layer instanceof BipedArmorLayer);
-            layers.add(new CustomHeldItemLayer<>(player));
-            layers.add(new HeadLayer<>(player));
+            layers.removeIf(layer -> layer instanceof HeadLayer || layer instanceof BipedArmorLayer);
+            layers.add(new HeadLayer<>(player)); //TODO test if I really need this?
             layers.add(new BipedArmorLayer<>(player, new CustomBipedModel<>(model, 0.5F), new CustomBipedModel<>(model, 1.0F)));
         }
         ObfuscationReflectionHelper.setPrivateValue(LivingRenderer.class, player, model, "field_77045_g");

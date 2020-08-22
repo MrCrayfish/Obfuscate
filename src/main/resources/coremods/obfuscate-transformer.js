@@ -25,7 +25,20 @@ function initializeCoreMod() {
 		        patch_LivingRenderer_func_225623_a_(method);
 		        return method;
 		    }
-		}
+		},
+		'held_item_layer': {
+            'target': {
+                'type': 'METHOD',
+                'class': 'net.minecraft.client.renderer.entity.layers.HeldItemLayer',
+                'methodName': 'func_229135_a_',
+                'methodDesc': '(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;Lnet/minecraft/util/HandSide;Lcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;I)V'
+            },
+            'transformer': function(method) {
+                print("[obfuscate] Patching HeldItemLayer#func_229135_a_");
+                patch_HeldItemLayer_func_229135_a_(method);
+                return method;
+            }
+        }
 	};
 }
 
@@ -66,6 +79,17 @@ function patch_LivingRenderer_func_225623_a_(method) {
         return;
     }
     print("[obfuscate] Failed to patch LivingRenderer#func_225623_a_");
+}
+
+function patch_HeldItemLayer_func_229135_a_(method) {
+    var entryNode = findFirstMethodInsnNode(method, Opcodes.INVOKEVIRTUAL, "func_228397_a_", "(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;ZLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;I)V");
+    if(entryNode !== null) {
+        method.instructions.insertBefore(entryNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/obfuscate/client/Hooks", "fireRenderHeldItem", "(Lnet/minecraft/client/renderer/FirstPersonRenderer;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;ZLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;I)V", false));
+        method.instructions.remove(entryNode);
+        print("[obfuscate] Successfully patched HeldItemLayer#func_229135_a_");
+        return;
+    }
+    print("[obfuscate] Failed to patch HeldItemLayer#func_229135_a_");
 }
 
 function findFirstMethodInsnNode(method, opcode, name, desc) {
