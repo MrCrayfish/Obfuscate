@@ -1,8 +1,11 @@
 package com.mrcrayfish.obfuscate;
 
 import com.mrcrayfish.obfuscate.client.ClientHandler;
+import com.mrcrayfish.obfuscate.client.event.PlayerModelEvent;
 import com.mrcrayfish.obfuscate.common.data.SyncedPlayerData;
 import com.mrcrayfish.obfuscate.network.PacketHandler;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -22,6 +25,7 @@ public class Obfuscate
     {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupCommon);
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     private void setupCommon(FMLCommonSetupEvent event)

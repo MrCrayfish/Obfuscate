@@ -62,8 +62,7 @@ public class ClientHandler
         List<LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>> layers = ObfuscationReflectionHelper.getPrivateValue(LivingRenderer.class, player, "field_177097_h");
         if(layers != null)
         {
-            layers.removeIf(layer -> layer instanceof HeadLayer || layer instanceof BipedArmorLayer);
-            layers.add(new HeadLayer<>(player)); //TODO test if I really need this?
+            layers.removeIf(layer -> layer instanceof BipedArmorLayer);
             layers.add(new BipedArmorLayer<>(player, new CustomBipedModel<>(model, 0.5F), new CustomBipedModel<>(model, 1.0F)));
         }
         ObfuscationReflectionHelper.setPrivateValue(LivingRenderer.class, player, model, "field_77045_g");
@@ -80,13 +79,8 @@ public class ClientHandler
             if(entity instanceof PlayerEntity)
             {
                 PlayerEntity player = (PlayerEntity) entity;
-                entries.forEach(entry -> this.setSyncedValue(player, entry));
+                entries.forEach(entry -> SyncedPlayerData.instance().updateClientEntry(player, entry));
             }
         }
-    }
-
-    private <T> void setSyncedValue(PlayerEntity player, SyncedPlayerData.DataEntry<T> entry)
-    {
-        SyncedPlayerData.instance().set(player, entry.getKey(), entry.getValue());
     }
 }
