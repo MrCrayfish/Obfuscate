@@ -18,8 +18,9 @@ public class CustomBipedModel<T extends LivingEntity> extends BipedModel<T>
     }
 
     @Override
-    public void setLivingAnimations(T entityIn, float limbSwing, float limbSwingAmount, float partialTick)
+    public void render(T entityIn, float limbSwing, float limbSwingAmount, float somethingToDoWithArmSwing, float headYaw, float headPitch)
     {
+        super.render(entityIn, limbSwing, limbSwingAmount, somethingToDoWithArmSwing, headYaw, headPitch);
         copyProperties(source.bipedHeadwear, bipedHeadwear);
         copyProperties(source.bipedHead, bipedHead);
         copyProperties(source.bipedBody, bipedBody);
@@ -37,8 +38,5 @@ public class CustomBipedModel<T extends LivingEntity> extends BipedModel<T>
         target.rotationPointX = source.rotationPointX;
         target.rotationPointY = source.rotationPointY;
         target.rotationPointZ = source.rotationPointZ;
-        /*target.offsetX = source.offsetX; //TODO Look into how it offsets this now
-        target.offsetY = source.offsetY;
-        target.offsetZ = source.offsetZ;*/
     }
 }
