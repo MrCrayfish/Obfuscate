@@ -31,8 +31,8 @@ public class PlayerModelUtil
     /**
      * Adds a layer renderer to the player model but with the ability to control based on model type
      *
-     * @param defaultLayer
-     * @param slimLayer
+     * @param defaultLayer a custom layer renderer for the default model
+     * @param slimLayer a custom layer renderer for the slim model
      */
     public static void addLayerRenderer(LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> defaultLayer, LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> slimLayer)
     {
