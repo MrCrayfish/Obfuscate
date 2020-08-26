@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.HandSide;
@@ -54,6 +55,15 @@ public class Hooks
         {
             Minecraft.getInstance().getFirstPersonRenderer().renderItemSide(entity, stack, transformType, leftHanded, matrixStack, renderTypeBuffer, light);
             MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held.Post(entity, stack, transformType, matrixStack, renderTypeBuffer, leftHanded ? HandSide.LEFT : HandSide.RIGHT, light, OverlayTexture.DEFAULT_LIGHT, partialTicks));
+        }
+    }
+
+    public static void fireRenderEntityItem(ItemRenderer renderer, ItemStack stack, ItemCameraTransforms.TransformType transformType, boolean leftHanded, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, IBakedModel model, ItemEntity entity, float partialTicks)
+    {
+        if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Pre(entity, stack, matrixStack, renderTypeBuffer, light, overlay, partialTicks)))
+        {
+            Minecraft.getInstance().getItemRenderer().func_229111_a_(stack, transformType, leftHanded, matrixStack, renderTypeBuffer, light, overlay, model);
+            MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Post(entity, stack, matrixStack, renderTypeBuffer, light, overlay, partialTicks));
         }
     }
 }

@@ -26,7 +26,7 @@ function initializeCoreMod() {
 		        return method;
 		    }
 		},
-		'held_item_layer': {
+		'held_item_layer_patch': {
             'target': {
                 'type': 'METHOD',
                 'class': 'net.minecraft.client.renderer.entity.layers.HeldItemLayer',
@@ -36,6 +36,19 @@ function initializeCoreMod() {
             'transformer': function(method) {
                 print("[obfuscate] Patching HeldItemLayer#func_229135_a_");
                 patch_HeldItemLayer_func_229135_a_(method);
+                return method;
+            }
+        },
+        'item_renderer_patch': {
+            'target': {
+                'type': 'METHOD',
+                'class': 'net.minecraft.client.renderer.entity.ItemRenderer',
+                'methodName': 'func_225623_a_',
+                'methodDesc': '(Lnet/minecraft/entity/item/ItemEntity;FFLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;I)V'
+            },
+            'transformer': function(method) {
+                print("[obfuscate] Patching ItemRenderer#func_225623_a_");
+                patch_ItemRenderer_func_225623_a_(method);
                 return method;
             }
         }
@@ -90,6 +103,19 @@ function patch_HeldItemLayer_func_229135_a_(method) {
         return;
     }
     print("[obfuscate] Failed to patch HeldItemLayer#func_229135_a_");
+}
+
+function patch_ItemRenderer_func_225623_a_(method) {
+    var entryNode = findFirstMethodInsnNode(method, Opcodes.INVOKEVIRTUAL, "func_229111_a_", "(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;ZLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;IILnet/minecraft/client/renderer/model/IBakedModel;)V");
+    if(entryNode !== null) {
+        method.instructions.insertBefore(entryNode, new VarInsnNode(Opcodes.ALOAD, 1)); //entityItem
+        method.instructions.insertBefore(entryNode, new VarInsnNode(Opcodes.FLOAD, 3)); //partialTicks
+        method.instructions.insertBefore(entryNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/obfuscate/client/Hooks", "fireRenderEntityItem", "(Lnet/minecraft/client/renderer/ItemRenderer;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;ZLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;IILnet/minecraft/client/renderer/model/IBakedModel;Lnet/minecraft/entity/item/ItemEntity;F)V", false));
+        method.instructions.remove(entryNode);
+        print("[obfuscate] Successfully patched ItemRenderer#func_229110_a_");
+        return;
+    }
+    print("[obfuscate] Failed to patch ItemRenderer#func_229110_a_");
 }
 
 function findFirstMethodInsnNode(method, opcode, name, desc) {

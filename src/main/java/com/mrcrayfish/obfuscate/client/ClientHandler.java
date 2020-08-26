@@ -3,7 +3,6 @@ package com.mrcrayfish.obfuscate.client;
 import com.mrcrayfish.obfuscate.Obfuscate;
 import com.mrcrayfish.obfuscate.client.model.CustomBipedModel;
 import com.mrcrayfish.obfuscate.client.model.CustomPlayerModel;
-import com.mrcrayfish.obfuscate.client.renderer.entity.CustomItemRenderer;
 import com.mrcrayfish.obfuscate.client.util.PlayerModelUtil;
 import com.mrcrayfish.obfuscate.common.data.SyncedPlayerData;
 import net.minecraft.client.Minecraft;
@@ -42,8 +41,6 @@ public class ClientHandler
 
     public void setup()
     {
-        RenderingRegistry.registerEntityRenderingHandler(EntityType.ITEM, manager -> new CustomItemRenderer(manager, Minecraft.getInstance().getItemRenderer()));
-
         Obfuscate.LOGGER.info("Starting to patch player models...");
         PlayerModelUtil.modifyPlayerModel((renderer, layers, slim) -> {
             PlayerModel<AbstractClientPlayerEntity> model = new CustomPlayerModel(0.0F, slim);
