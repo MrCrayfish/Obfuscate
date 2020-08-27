@@ -3,7 +3,7 @@ loaderVersion="[30,)"
 
 [[mods]]
 modId="obfuscate"
-version="0.4.3"
+version="0.5.0"
 displayName="Obfuscate"
 updateJSONURL="https://raw.githubusercontent.com/MrCrayfish/Obfuscate/master/update.json"
 displayURL="https://mrcrayfish.com/"
