@@ -29,7 +29,7 @@ public class Hooks
     {
         if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Gui.Pre(stack, matrixStack, renderTypeBuffer, light, overlay)))
         {
-            Minecraft.getInstance().getItemRenderer().func_229111_a_(stack, transformType, leftHanded, matrixStack, renderTypeBuffer, light, overlay, model);
+            renderer.func_229111_a_(stack, transformType, leftHanded, matrixStack, renderTypeBuffer, light, overlay, model);
             MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Gui.Post(stack, matrixStack, renderTypeBuffer, light, overlay));
         }
     }
@@ -53,7 +53,7 @@ public class Hooks
         float partialTicks = Minecraft.getInstance().getRenderPartialTicks();
         if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held.Pre(entity, stack, transformType, matrixStack, renderTypeBuffer, leftHanded ? HandSide.LEFT : HandSide.RIGHT, light, OverlayTexture.DEFAULT_LIGHT, partialTicks)))
         {
-            Minecraft.getInstance().getFirstPersonRenderer().renderItemSide(entity, stack, transformType, leftHanded, matrixStack, renderTypeBuffer, light);
+            renderer.renderItemSide(entity, stack, transformType, leftHanded, matrixStack, renderTypeBuffer, light);
             MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held.Post(entity, stack, transformType, matrixStack, renderTypeBuffer, leftHanded ? HandSide.LEFT : HandSide.RIGHT, light, OverlayTexture.DEFAULT_LIGHT, partialTicks));
         }
     }
@@ -62,8 +62,17 @@ public class Hooks
     {
         if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Pre(entity, stack, matrixStack, renderTypeBuffer, light, overlay, partialTicks)))
         {
-            Minecraft.getInstance().getItemRenderer().func_229111_a_(stack, transformType, leftHanded, matrixStack, renderTypeBuffer, light, overlay, model);
+            renderer.func_229111_a_(stack, transformType, leftHanded, matrixStack, renderTypeBuffer, light, overlay, model);
             MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Post(entity, stack, matrixStack, renderTypeBuffer, light, overlay, partialTicks));
+        }
+    }
+
+    public static void fireRenderItemFrameItem(ItemRenderer renderer, ItemStack stack, ItemCameraTransforms.TransformType transformType, int light, int overlay, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, float partialTicks)
+    {
+        if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.ItemFrame.Pre(stack, matrixStack, renderTypeBuffer, light, overlay, partialTicks)))
+        {
+            renderer.renderItem(stack, transformType, light, overlay, matrixStack, renderTypeBuffer);
+            MinecraftForge.EVENT_BUS.post(new RenderItemEvent.ItemFrame.Post(stack, matrixStack, renderTypeBuffer, light, overlay, partialTicks));
         }
     }
 }

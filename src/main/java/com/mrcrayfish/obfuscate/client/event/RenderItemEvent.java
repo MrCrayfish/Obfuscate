@@ -1,6 +1,7 @@
 package com.mrcrayfish.obfuscate.client.event;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.entity.LivingEntity;
@@ -159,7 +160,7 @@ public class RenderItemEvent extends Event
     {
         public Gui(ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay)
         {
-            super(heldItem, ItemCameraTransforms.TransformType.GUI, matrixStack, renderTypeBuffer, light, overlay, 0.0F);
+            super(heldItem, ItemCameraTransforms.TransformType.GUI, matrixStack, renderTypeBuffer, light, overlay, Minecraft.getInstance().getRenderPartialTicks());
         }
 
         public static class Pre extends Gui
@@ -175,6 +176,37 @@ public class RenderItemEvent extends Event
             public Post(ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay)
             {
                 super(heldItem, matrixStack, renderTypeBuffer, light, overlay);
+            }
+
+            @Override
+            public boolean isCancelable()
+            {
+                return false;
+            }
+        }
+    }
+
+    @Cancelable
+    public static class ItemFrame extends RenderItemEvent
+    {
+        public ItemFrame(ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
+        {
+            super(heldItem, ItemCameraTransforms.TransformType.FIXED, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
+        }
+
+        public static class Pre extends ItemFrame
+        {
+            public Pre(ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
+            {
+                super(heldItem, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
+            }
+        }
+
+        public static class Post extends ItemFrame
+        {
+            public Post(ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
+            {
+                super(heldItem, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
             }
 
             @Override

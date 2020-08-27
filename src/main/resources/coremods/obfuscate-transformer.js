@@ -39,7 +39,7 @@ function initializeCoreMod() {
                 return method;
             }
         },
-        'item_renderer_patch': {
+        'entity_item_renderer_patch': {
             'target': {
                 'type': 'METHOD',
                 'class': 'net.minecraft.client.renderer.entity.ItemRenderer',
@@ -49,6 +49,19 @@ function initializeCoreMod() {
             'transformer': function(method) {
                 print("[obfuscate] Patching ItemRenderer#func_225623_a_");
                 patch_ItemRenderer_func_225623_a_(method);
+                return method;
+            }
+        },
+        'entity_item_frame_patch': {
+            'target': {
+                'type': 'METHOD',
+                'class': 'net.minecraft.client.renderer.entity.ItemFrameRenderer',
+                'methodName': 'func_225623_a_',
+                'methodDesc': '(Lnet/minecraft/entity/item/ItemFrameEntity;FFLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;I)V'
+            },
+            'transformer': function(method) {
+                print("[obfuscate] Patching ItemFrameRenderer#func_225623_a_");
+                patch_ItemFrameRenderer_func_225623_a_(method);
                 return method;
             }
         }
@@ -116,6 +129,18 @@ function patch_ItemRenderer_func_225623_a_(method) {
         return;
     }
     print("[obfuscate] Failed to patch ItemRenderer#func_229110_a_");
+}
+
+function patch_ItemFrameRenderer_func_225623_a_(method) {
+    var entryNode = findFirstMethodInsnNode(method, Opcodes.INVOKEVIRTUAL, "func_229110_a_", "(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;IILcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;)V");
+    if(entryNode !== null) {
+        method.instructions.insertBefore(entryNode, new VarInsnNode(Opcodes.FLOAD, 3));
+        method.instructions.insertBefore(entryNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/obfuscate/client/Hooks", "fireRenderItemFrameItem", "(Lnet/minecraft/client/renderer/ItemRenderer;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;IILcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;F)V", false));
+        method.instructions.remove(entryNode);
+        print("[obfuscate] Successfully patched ItemFrameRenderer#func_225623_a_");
+        return;
+    }
+    print("[obfuscate] Failed to patch ItemFrameRenderer#func_225623_a_");
 }
 
 function findFirstMethodInsnNode(method, opcode, name, desc) {
