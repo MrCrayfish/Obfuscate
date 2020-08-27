@@ -64,6 +64,19 @@ function initializeCoreMod() {
                 patch_ItemFrameRenderer_func_225623_a_(method);
                 return method;
             }
+        },
+        'head_layer_patch': {
+            'target': {
+                'type': 'METHOD',
+                'class': 'net.minecraft.client.renderer.entity.layers.HeadLayer',
+                'methodName': 'func_225628_a_',
+                'methodDesc': '(Lcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;ILnet/minecraft/entity/LivingEntity;FFFFFF)V'
+            },
+            'transformer': function(method) {
+                print("[obfuscate] Patching HeadLayer#func_225628_a_");
+                patch_HeadLayer_func_225628_a_(method);
+                return method;
+            }
         }
 	};
 }
@@ -141,6 +154,18 @@ function patch_ItemFrameRenderer_func_225623_a_(method) {
         return;
     }
     print("[obfuscate] Failed to patch ItemFrameRenderer#func_225623_a_");
+}
+
+function patch_HeadLayer_func_225628_a_(method) {
+    var entryNode = findFirstMethodInsnNode(method, Opcodes.INVOKEVIRTUAL, "func_228397_a_", "(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;ZLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;I)V");
+    if(entryNode !== null) {
+        method.instructions.insertBefore(entryNode, new VarInsnNode(Opcodes.FLOAD, 7)); //partialTicks
+        method.instructions.insertBefore(entryNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/obfuscate/client/Hooks", "fireRenderHeadItem", "(Lnet/minecraft/client/renderer/FirstPersonRenderer;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;ZLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;IF)V", false));
+        method.instructions.remove(entryNode);
+        print("[obfuscate] Successfully patched HeadLayer#func_225628_a_");
+        return;
+    }
+    print("[obfuscate] Failed to patch HeadLayer#func_225628_a_");
 }
 
 function findFirstMethodInsnNode(method, opcode, name, desc) {

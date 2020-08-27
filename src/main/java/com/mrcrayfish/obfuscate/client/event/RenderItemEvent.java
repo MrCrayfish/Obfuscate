@@ -217,4 +217,37 @@ public class RenderItemEvent extends Event
             }
         }
     }
+
+    @Cancelable
+    public static class Head extends RenderItemEvent
+    {
+        private LivingEntity entity;
+
+        public Head(LivingEntity entity, ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
+        {
+            super(heldItem, ItemCameraTransforms.TransformType.FIXED, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
+        }
+
+        public static class Pre extends Head
+        {
+            public Pre(LivingEntity entity, ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
+            {
+                super(entity, heldItem, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
+            }
+        }
+
+        public static class Post extends Head
+        {
+            public Post(LivingEntity entity, ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
+            {
+                super(entity, heldItem, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
+            }
+
+            @Override
+            public boolean isCancelable()
+            {
+                return false;
+            }
+        }
+    }
 }

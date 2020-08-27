@@ -23,6 +23,7 @@ import net.minecraftforge.common.MinecraftForge;
 /**
  * Author: MrCrayfish
  */
+@SuppressWarnings("unused")
 public class Hooks
 {
     public static void fireRenderGuiItem(ItemRenderer renderer, ItemStack stack, ItemCameraTransforms.TransformType transformType, boolean leftHanded, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, IBakedModel model)
@@ -73,6 +74,15 @@ public class Hooks
         {
             renderer.renderItem(stack, transformType, light, overlay, matrixStack, renderTypeBuffer);
             MinecraftForge.EVENT_BUS.post(new RenderItemEvent.ItemFrame.Post(stack, matrixStack, renderTypeBuffer, light, overlay, partialTicks));
+        }
+    }
+
+    public static void fireRenderHeadItem(FirstPersonRenderer renderer, LivingEntity entity, ItemStack stack, ItemCameraTransforms.TransformType transformType, boolean leftHanded, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, float partialTicks)
+    {
+        if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Head.Pre(entity, stack, matrixStack, renderTypeBuffer, light, OverlayTexture.DEFAULT_LIGHT, partialTicks)))
+        {
+            renderer.renderItemSide(entity, stack, transformType, leftHanded, matrixStack, renderTypeBuffer, light);
+            MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Head.Post(entity, stack, matrixStack, renderTypeBuffer, light, OverlayTexture.DEFAULT_LIGHT, partialTicks));
         }
     }
 }
