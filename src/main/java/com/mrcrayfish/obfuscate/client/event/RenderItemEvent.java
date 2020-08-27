@@ -14,6 +14,7 @@ import net.minecraftforge.eventbus.api.Event;
 /**
  * Author: MrCrayfish
  */
+@Cancelable
 public class RenderItemEvent extends Event
 {
     private ItemStack heldItem;
