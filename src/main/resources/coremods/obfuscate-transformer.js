@@ -26,7 +26,7 @@ function initializeCoreMod() {
 		        return method;
 		    }
 		},
-		'held_item_layer': {
+		'held_item_layer_patch': {
             'target': {
                 'type': 'METHOD',
                 'class': 'net.minecraft.client.renderer.entity.layers.HeldItemLayer',
@@ -36,6 +36,45 @@ function initializeCoreMod() {
             'transformer': function(method) {
                 print("[obfuscate] Patching HeldItemLayer#func_229135_a_");
                 patch_HeldItemLayer_func_229135_a_(method);
+                return method;
+            }
+        },
+        'entity_item_renderer_patch': {
+            'target': {
+                'type': 'METHOD',
+                'class': 'net.minecraft.client.renderer.entity.ItemRenderer',
+                'methodName': 'func_225623_a_',
+                'methodDesc': '(Lnet/minecraft/entity/item/ItemEntity;FFLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;I)V'
+            },
+            'transformer': function(method) {
+                print("[obfuscate] Patching ItemRenderer#func_225623_a_");
+                patch_ItemRenderer_func_225623_a_(method);
+                return method;
+            }
+        },
+        'entity_item_frame_patch': {
+            'target': {
+                'type': 'METHOD',
+                'class': 'net.minecraft.client.renderer.entity.ItemFrameRenderer',
+                'methodName': 'func_225623_a_',
+                'methodDesc': '(Lnet/minecraft/entity/item/ItemFrameEntity;FFLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;I)V'
+            },
+            'transformer': function(method) {
+                print("[obfuscate] Patching ItemFrameRenderer#func_225623_a_");
+                patch_ItemFrameRenderer_func_225623_a_(method);
+                return method;
+            }
+        },
+        'head_layer_patch': {
+            'target': {
+                'type': 'METHOD',
+                'class': 'net.minecraft.client.renderer.entity.layers.HeadLayer',
+                'methodName': 'func_225628_a_',
+                'methodDesc': '(Lcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;ILnet/minecraft/entity/LivingEntity;FFFFFF)V'
+            },
+            'transformer': function(method) {
+                print("[obfuscate] Patching HeadLayer#func_225628_a_");
+                patch_HeadLayer_func_225628_a_(method);
                 return method;
             }
         }
@@ -90,6 +129,43 @@ function patch_HeldItemLayer_func_229135_a_(method) {
         return;
     }
     print("[obfuscate] Failed to patch HeldItemLayer#func_229135_a_");
+}
+
+function patch_ItemRenderer_func_225623_a_(method) {
+    var entryNode = findFirstMethodInsnNode(method, Opcodes.INVOKEVIRTUAL, "func_229111_a_", "(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;ZLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;IILnet/minecraft/client/renderer/model/IBakedModel;)V");
+    if(entryNode !== null) {
+        method.instructions.insertBefore(entryNode, new VarInsnNode(Opcodes.ALOAD, 1)); //entityItem
+        method.instructions.insertBefore(entryNode, new VarInsnNode(Opcodes.FLOAD, 3)); //partialTicks
+        method.instructions.insertBefore(entryNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/obfuscate/client/Hooks", "fireRenderEntityItem", "(Lnet/minecraft/client/renderer/ItemRenderer;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;ZLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;IILnet/minecraft/client/renderer/model/IBakedModel;Lnet/minecraft/entity/item/ItemEntity;F)V", false));
+        method.instructions.remove(entryNode);
+        print("[obfuscate] Successfully patched ItemRenderer#func_229110_a_");
+        return;
+    }
+    print("[obfuscate] Failed to patch ItemRenderer#func_229110_a_");
+}
+
+function patch_ItemFrameRenderer_func_225623_a_(method) {
+    var entryNode = findFirstMethodInsnNode(method, Opcodes.INVOKEVIRTUAL, "func_229110_a_", "(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;IILcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;)V");
+    if(entryNode !== null) {
+        method.instructions.insertBefore(entryNode, new VarInsnNode(Opcodes.FLOAD, 3));
+        method.instructions.insertBefore(entryNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/obfuscate/client/Hooks", "fireRenderItemFrameItem", "(Lnet/minecraft/client/renderer/ItemRenderer;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;IILcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;F)V", false));
+        method.instructions.remove(entryNode);
+        print("[obfuscate] Successfully patched ItemFrameRenderer#func_225623_a_");
+        return;
+    }
+    print("[obfuscate] Failed to patch ItemFrameRenderer#func_225623_a_");
+}
+
+function patch_HeadLayer_func_225628_a_(method) {
+    var entryNode = findFirstMethodInsnNode(method, Opcodes.INVOKEVIRTUAL, "func_228397_a_", "(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;ZLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;I)V");
+    if(entryNode !== null) {
+        method.instructions.insertBefore(entryNode, new VarInsnNode(Opcodes.FLOAD, 7)); //partialTicks
+        method.instructions.insertBefore(entryNode, new MethodInsnNode(Opcodes.INVOKESTATIC, "com/mrcrayfish/obfuscate/client/Hooks", "fireRenderHeadItem", "(Lnet/minecraft/client/renderer/FirstPersonRenderer;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;ZLcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;IF)V", false));
+        method.instructions.remove(entryNode);
+        print("[obfuscate] Successfully patched HeadLayer#func_225628_a_");
+        return;
+    }
+    print("[obfuscate] Failed to patch HeadLayer#func_225628_a_");
 }
 
 function findFirstMethodInsnNode(method, opcode, name, desc) {

@@ -25,7 +25,6 @@ public class Obfuscate
     {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupClient);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupCommon);
-        MinecraftForge.EVENT_BUS.register(this);
     }
 
     private void setupCommon(FMLCommonSetupEvent event)

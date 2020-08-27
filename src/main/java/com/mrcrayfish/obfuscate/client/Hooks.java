@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.HandSide;
@@ -22,13 +23,14 @@ import net.minecraftforge.common.MinecraftForge;
 /**
  * Author: MrCrayfish
  */
+@SuppressWarnings("unused")
 public class Hooks
 {
     public static void fireRenderGuiItem(ItemRenderer renderer, ItemStack stack, ItemCameraTransforms.TransformType transformType, boolean leftHanded, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, IBakedModel model)
     {
         if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Gui.Pre(stack, matrixStack, renderTypeBuffer, light, overlay)))
         {
-            Minecraft.getInstance().getItemRenderer().renderItem(stack, transformType, leftHanded, matrixStack, renderTypeBuffer, light, overlay, model);
+            renderer.func_229111_a_(stack, transformType, leftHanded, matrixStack, renderTypeBuffer, light, overlay, model);
             MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Gui.Post(stack, matrixStack, renderTypeBuffer, light, overlay));
         }
     }
@@ -52,8 +54,35 @@ public class Hooks
         float partialTicks = Minecraft.getInstance().getRenderPartialTicks();
         if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held.Pre(entity, stack, transformType, matrixStack, renderTypeBuffer, leftHanded ? HandSide.LEFT : HandSide.RIGHT, light, OverlayTexture.NO_OVERLAY, partialTicks)))
         {
-            Minecraft.getInstance().getFirstPersonRenderer().renderItemSide(entity, stack, transformType, leftHanded, matrixStack, renderTypeBuffer, light);
-            MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held.Post(entity, stack, transformType, matrixStack, renderTypeBuffer, leftHanded ? HandSide.LEFT : HandSide.RIGHT, light, OverlayTexture.NO_OVERLAY, partialTicks));
+            renderer.renderItemSide(entity, stack, transformType, leftHanded, matrixStack, renderTypeBuffer, light);
+            MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Held.Post(entity, stack, transformType, matrixStack, renderTypeBuffer, leftHanded ? HandSide.LEFT : HandSide.RIGHT, light, OverlayTexture.DEFAULT_LIGHT, partialTicks));
+        }
+    }
+
+    public static void fireRenderEntityItem(ItemRenderer renderer, ItemStack stack, ItemCameraTransforms.TransformType transformType, boolean leftHanded, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, IBakedModel model, ItemEntity entity, float partialTicks)
+    {
+        if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Pre(entity, stack, matrixStack, renderTypeBuffer, light, overlay, partialTicks)))
+        {
+            renderer.func_229111_a_(stack, transformType, leftHanded, matrixStack, renderTypeBuffer, light, overlay, model);
+            MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Entity.Post(entity, stack, matrixStack, renderTypeBuffer, light, overlay, partialTicks));
+        }
+    }
+
+    public static void fireRenderItemFrameItem(ItemRenderer renderer, ItemStack stack, ItemCameraTransforms.TransformType transformType, int light, int overlay, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, float partialTicks)
+    {
+        if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.ItemFrame.Pre(stack, matrixStack, renderTypeBuffer, light, overlay, partialTicks)))
+        {
+            renderer.renderItem(stack, transformType, light, overlay, matrixStack, renderTypeBuffer);
+            MinecraftForge.EVENT_BUS.post(new RenderItemEvent.ItemFrame.Post(stack, matrixStack, renderTypeBuffer, light, overlay, partialTicks));
+        }
+    }
+
+    public static void fireRenderHeadItem(FirstPersonRenderer renderer, LivingEntity entity, ItemStack stack, ItemCameraTransforms.TransformType transformType, boolean leftHanded, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, float partialTicks)
+    {
+        if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Head.Pre(entity, stack, matrixStack, renderTypeBuffer, light, OverlayTexture.DEFAULT_LIGHT, partialTicks)))
+        {
+            renderer.renderItemSide(entity, stack, transformType, leftHanded, matrixStack, renderTypeBuffer, light);
+            MinecraftForge.EVENT_BUS.post(new RenderItemEvent.Head.Post(entity, stack, matrixStack, renderTypeBuffer, light, OverlayTexture.DEFAULT_LIGHT, partialTicks));
         }
     }
 }
