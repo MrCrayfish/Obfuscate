@@ -69,8 +69,8 @@ SyncedPlayerData.instance().get(player, ModSyncedDataKeys.AIMING)
 You can start using this library simply by adding this code to your **build.gradle** file. You'll want to replace the curseforge_file_id with a version of Obfuscate targeted towards your Minecraft version.
 
 ```gradle
-//Minecraft 1.16.1: 3000205
-//Minecraft 1.15.2: 2946425
+//Minecraft 1.16.1: 3043369
+//Minecraft 1.15.2: 3043368
 //Minecraft 1.14.4: 2912286
 //Minecraft 1.12.2: 2912288
 
