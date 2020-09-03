@@ -33,7 +33,7 @@ This gives you the ability to handle rendering of items yourself. Obfuscate prov
 /* An example of controlling held item on player model. See RenderItemEvent for all events. 
  * You can implement just RenderItemEvent to control all cases. */
 @SubscribeEvent
-public void setupPlayerRotations(RenderItemEvent.Held.Pre event)
+public void onRenderHeldItem(RenderItemEvent.Held.Pre event)
 {
     if(condition)
     {
