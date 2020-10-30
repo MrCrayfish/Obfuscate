@@ -37,7 +37,7 @@ public class Hooks
 
     public static void fireRenderPlayer(EntityModel model, MatrixStack matrixStack, IVertexBuilder builder, int light, int overlay, float red, float green, float blue, float alpha, LivingEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
     {
-        if(entity instanceof PlayerEntity)
+        if(entity instanceof PlayerEntity && model instanceof PlayerModel)
         {
             if(!MinecraftForge.EVENT_BUS.post(new PlayerModelEvent.Render.Pre((PlayerEntity) entity, (PlayerModel) model, matrixStack, builder, light, overlay, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, Minecraft.getInstance().getRenderPartialTicks())))
             {
