@@ -17,10 +17,11 @@ public class ObfuscateMixinPlugin implements IMixinConfigPlugin
         try 
         {
             Class.forName("optifine.Installer");
-            optifineLoaded = true;
-        } catch (ClassNotFoundException e) 
+            this.optifineLoaded = true;
+        }
+        catch (ClassNotFoundException e)
         {
-            optifineLoaded = false;
+            this.optifineLoaded = false;
         }
     }
 
@@ -33,7 +34,7 @@ public class ObfuscateMixinPlugin implements IMixinConfigPlugin
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) 
     {
-        return optifineLoaded ? !mixinClassName.equals("com.mrcrayfish.obfuscate.mixin.client.LivingRendererMixin") : !mixinClassName.equals("com.mrcrayfish.obfuscate.mixin.client.OptifineLivingRendererMixin");
+        return this.optifineLoaded ? !mixinClassName.equals("com.mrcrayfish.obfuscate.mixin.client.LivingRendererMixin") : !mixinClassName.equals("com.mrcrayfish.obfuscate.mixin.client.OptifineLivingRendererMixin");
     }
 
     @Override
