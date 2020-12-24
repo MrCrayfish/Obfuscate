@@ -1,0 +1,21 @@
+{
+  "required": true,
+  "package": "com.mrcrayfish.obfuscate.mixin",
+  "plugin": "com.mrcrayfish.obfuscate.mixin.ObfuscateMixinPlugin",
+  "compatibilityLevel": "JAVA_8",
+  "minVersion": "0.8",
+  "refmap": "obfuscate.refmap.json",
+  "mixins": [],
+  "client": [
+    "client.HeadLayerMixin",
+    "client.HeldItemLayerMixin",
+    "client.ItemEntityRendererMixin",
+    "client.ItemFrameRendererMixin",
+    "client.ItemRendererMixin",
+    "client.LivingRendererMixin",
+    "client.OptifineLivingRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+} 
