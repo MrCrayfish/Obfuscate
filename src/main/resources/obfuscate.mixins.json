@@ -13,7 +13,8 @@
     "client.ItemFrameRendererMixin",
     "client.ItemRendererMixin",
     "client.LivingRendererMixin",
-    "client.OptifineLivingRendererMixin"
+    "client.OptifineLivingRendererMixin",
+    "client.PlayerModelMixin"
   ],
   "injectors": {
     "defaultRequire": 1
