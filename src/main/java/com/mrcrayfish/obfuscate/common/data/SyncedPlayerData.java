@@ -158,7 +158,7 @@ public class SyncedPlayerData
     }
 
     @Nullable
-    public SyncedDataKey<?> getKey(int id)
+    private SyncedDataKey<?> getKey(int id)
     {
         return this.idToDataKey.get(id);
     }
@@ -287,13 +287,13 @@ public class SyncedPlayerData
         }
     }
 
-    public static class DataHolder
+    private static class DataHolder
     {
         private Map<SyncedDataKey<?>, DataEntry<?>> dataMap = new HashMap<>();
         private boolean dirty = false;
 
         @SuppressWarnings("unchecked")
-        public <T> boolean set(PlayerEntity player, SyncedDataKey<T> key, T value)
+        private <T> boolean set(PlayerEntity player, SyncedDataKey<T> key, T value)
         {
             DataEntry<T> entry = (DataEntry<T>) this.dataMap.computeIfAbsent(key, DataEntry::new);
             if(!entry.getValue().equals(value))
@@ -308,28 +308,28 @@ public class SyncedPlayerData
 
         @Nullable
         @SuppressWarnings("unchecked")
-        public <T> T get(SyncedDataKey<T> key)
+        private <T> T get(SyncedDataKey<T> key)
         {
             return (T) this.dataMap.computeIfAbsent(key, DataEntry::new).getValue();
         }
 
-        public boolean isDirty()
+        private boolean isDirty()
         {
             return this.dirty;
         }
 
-        public void clean()
+        private void clean()
         {
             this.dirty = false;
             this.dataMap.forEach((key, entry) -> entry.clean());
         }
 
-        public List<DataEntry<?>> gatherDirty()
+        private List<DataEntry<?>> gatherDirty()
         {
             return this.dataMap.values().stream().filter(DataEntry::isDirty).filter(entry -> entry.getKey().shouldSyncToClient()).collect(Collectors.toList());
         }
 
-        public List<DataEntry<?>> gatherAll()
+        private List<DataEntry<?>> gatherAll()
         {
             return this.dataMap.values().stream().filter(entry -> entry.getKey().shouldSyncToClient()).collect(Collectors.toList());
         }
@@ -347,28 +347,28 @@ public class SyncedPlayerData
             this.value = key.getDefaultValueSupplier().get();
         }
 
-        public SyncedDataKey<T> getKey()
+        private SyncedDataKey<T> getKey()
         {
             return this.key;
         }
 
-        public T getValue()
+        private T getValue()
         {
             return this.value;
         }
 
-        public void setValue(T value, boolean dirty)
+        private void setValue(T value, boolean dirty)
         {
             this.value = value;
             this.dirty = dirty;
         }
 
-        public boolean isDirty()
+        private boolean isDirty()
         {
             return this.dirty;
         }
 
-        public void clean()
+        private void clean()
         {
             this.dirty = false;
         }

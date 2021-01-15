@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 /**
  * Author: MrCrayfish
  */
-public class HandshakeHandler
+class HandshakeHandler
 {
     private static final Marker OBFUSCATE_HANDSHAKE = MarkerManager.getMarker("OBFUSCATE_HANDSHAKE");
 
