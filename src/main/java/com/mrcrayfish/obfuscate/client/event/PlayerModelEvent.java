@@ -34,37 +34,37 @@ public abstract class PlayerModelEvent extends PlayerEvent
 
     public PlayerModel getModelPlayer()
     {
-        return modelPlayer;
+        return this.modelPlayer;
     }
 
     public float getLimbSwing()
     {
-        return limbSwing;
+        return this.limbSwing;
     }
 
     public float getLimbSwingAmount()
     {
-        return limbSwingAmount;
+        return this.limbSwingAmount;
     }
 
     public float getAgeInTicks()
     {
-        return ageInTicks;
+        return this.ageInTicks;
     }
 
     public float getNetHeadYaw()
     {
-        return netHeadYaw;
+        return this.netHeadYaw;
     }
 
     public float getHeadPitch()
     {
-        return headPitch;
+        return this.headPitch;
     }
 
     public float getPartialTicks()
     {
-        return partialTicks;
+        return this.partialTicks;
     }
 
     @Cancelable
@@ -139,22 +139,22 @@ public abstract class PlayerModelEvent extends PlayerEvent
 
         public MatrixStack getMatrixStack()
         {
-            return matrixStack;
+            return this.matrixStack;
         }
 
         public IVertexBuilder getBuilder()
         {
-            return builder;
+            return this.builder;
         }
 
         public int getLight()
         {
-            return light;
+            return this.light;
         }
 
         public int getOverlay()
         {
-            return overlay;
+            return this.overlay;
         }
     }
 }

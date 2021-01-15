@@ -26,7 +26,7 @@ public class HandshakeMessages
 
         int getLoginIndex()
         {
-            return loginIndex;
+            return this.loginIndex;
         }
 
         @Override
@@ -81,7 +81,7 @@ public class HandshakeMessages
 
         public Map<ResourceLocation, Integer> getKeyMap()
         {
-            return keyMap;
+            return this.keyMap;
         }
     }
 }

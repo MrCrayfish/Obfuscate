@@ -29,37 +29,37 @@ public class SyncedDataKey<T>
 
     public ResourceLocation getKey()
     {
-        return key;
+        return this.key;
     }
 
     public IDataSerializer<T> getSerializer()
     {
-        return serializer;
+        return this.serializer;
     }
 
     public Supplier<T> getDefaultValueSupplier()
     {
-        return defaultValueSupplier;
+        return this.defaultValueSupplier;
     }
 
     public boolean shouldSave()
     {
-        return save;
+        return this.save;
     }
 
     public boolean isPersistent()
     {
-        return persistent;
+        return this.persistent;
     }
 
     public boolean shouldSyncToClient()
     {
-        return syncToClient;
+        return this.syncToClient;
     }
 
     public boolean shouldSyncToAllPlayers()
     {
-        return syncToAllPlayers;
+        return this.syncToAllPlayers;
     }
 
     public int getId()

@@ -38,37 +38,37 @@ public class RenderItemEvent extends Event
 
     public ItemStack getItem()
     {
-        return heldItem;
+        return this.heldItem;
     }
 
     public ItemCameraTransforms.TransformType getTransformType()
     {
-        return transformType;
+        return this.transformType;
     }
 
     public MatrixStack getMatrixStack()
     {
-        return matrixStack;
+        return this.matrixStack;
     }
 
     public IRenderTypeBuffer getRenderTypeBuffer()
     {
-        return renderTypeBuffer;
+        return this.renderTypeBuffer;
     }
 
     public int getLight()
     {
-        return light;
+        return this.light;
     }
 
     public int getOverlay()
     {
-        return overlay;
+        return this.overlay;
     }
 
     public float getPartialTicks()
     {
-        return partialTicks;
+        return this.partialTicks;
     }
 
     @Cancelable
@@ -86,12 +86,12 @@ public class RenderItemEvent extends Event
 
         public LivingEntity getEntity()
         {
-            return entity;
+            return this.entity;
         }
 
         public HandSide getHandSide()
         {
-            return handSide;
+            return this.handSide;
         }
 
         public static class Pre extends Held
@@ -130,7 +130,7 @@ public class RenderItemEvent extends Event
 
         public ItemEntity getEntity()
         {
-            return entity;
+            return this.entity;
         }
 
         public static class Pre extends Entity
