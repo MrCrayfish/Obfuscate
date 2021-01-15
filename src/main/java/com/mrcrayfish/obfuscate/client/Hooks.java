@@ -23,7 +23,6 @@ import net.minecraftforge.common.MinecraftForge;
 /**
  * Author: MrCrayfish
  */
-@SuppressWarnings("unused")
 public class Hooks
 {
     public static void fireRenderGuiItem(ItemRenderer renderer, ItemStack stack, ItemCameraTransforms.TransformType transformType, boolean leftHanded, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, IBakedModel model)
