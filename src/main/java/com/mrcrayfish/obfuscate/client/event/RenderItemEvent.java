@@ -226,6 +226,12 @@ public class RenderItemEvent extends Event
         public Head(LivingEntity entity, ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
         {
             super(heldItem, ItemCameraTransforms.TransformType.FIXED, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
+            this.entity = entity;
+        }
+
+        public LivingEntity getEntity()
+        {
+            return this.entity;
         }
 
         public static class Pre extends Head
