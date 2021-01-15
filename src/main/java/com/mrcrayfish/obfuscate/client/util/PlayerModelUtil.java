@@ -14,8 +14,11 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /**
+ * To be removed in a future update!
+ *
  * Author: MrCrayfish
  */
+@Deprecated
 public class PlayerModelUtil
 {
     /**
@@ -23,6 +26,7 @@ public class PlayerModelUtil
      *
      * @param supplier a custom layer renderer supplier
      */
+    @Deprecated
     public static void addLayerRenderer(Supplier<LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>> supplier)
     {
         addLayerRenderer(supplier.get(), supplier.get());
@@ -34,6 +38,7 @@ public class PlayerModelUtil
      * @param defaultLayer a custom layer renderer for the default model
      * @param slimLayer a custom layer renderer for the slim model
      */
+    @Deprecated
     public static void addLayerRenderer(LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> defaultLayer, LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> slimLayer)
     {
         modifyPlayerModel((renderer, layers, slim) -> layers.add(slim ? slimLayer : defaultLayer));
@@ -46,6 +51,7 @@ public class PlayerModelUtil
      *
      * @param modifier a player model modifier
      */
+    @Deprecated
     @SuppressWarnings("JavadocReference")
     public static void modifyPlayerModel(IPlayerModelModifier modifier)
     {
@@ -54,6 +60,7 @@ public class PlayerModelUtil
         applyPlayerModelModifier(skinMap.get("slim"), modifier, true);
     }
 
+    @Deprecated
     private static void applyPlayerModelModifier(PlayerRenderer renderer, IPlayerModelModifier modifier, boolean slim)
     {
         List<LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>> layers = ObfuscationReflectionHelper.getPrivateValue(LivingRenderer.class, renderer, "field_177097_h");

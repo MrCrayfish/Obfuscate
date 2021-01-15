@@ -8,8 +8,11 @@ import net.minecraft.client.renderer.entity.model.PlayerModel;
 import java.util.List;
 
 /**
+ * To be removed in a future update!
+ *
  * Author: MrCrayfish
  */
+@Deprecated
 public interface IPlayerModelModifier
 {
     void accept(PlayerRenderer renderer, List<LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>> layers, boolean slim);

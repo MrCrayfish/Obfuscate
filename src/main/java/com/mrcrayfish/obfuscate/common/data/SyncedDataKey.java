@@ -130,12 +130,23 @@ public class SyncedDataKey<T>
         }
 
         /**
-         * Sets the id for the synced key. This is a required property.
+         * Sets the id for the synced key using a String. This is a required property.
          */
+        public Builder<T> id(String id)
+        {
+            this.id = new ResourceLocation(id);
+            return this;
+        }
+
+        /**
+         * Sets the id for the synced key using a String. This is a required property.
+         *
+         * Please use {@link #id(String)} instead.
+         */
+        @Deprecated
         public Builder<T> key(String key)
         {
-            this.id = new ResourceLocation(key);
-            return this;
+            return id(key);
         }
 
         /**
