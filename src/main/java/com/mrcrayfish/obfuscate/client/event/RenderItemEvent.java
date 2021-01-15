@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.item.ItemFrameEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.HandSide;
 import net.minecraftforge.eventbus.api.Cancelable;
@@ -190,24 +191,32 @@ public class RenderItemEvent extends Event
     @Cancelable
     public static class ItemFrame extends RenderItemEvent
     {
-        public ItemFrame(ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
+        private ItemFrameEntity entity;
+
+        public ItemFrame(ItemFrameEntity entity, ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
         {
             super(heldItem, ItemCameraTransforms.TransformType.FIXED, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
+            this.entity = entity;
+        }
+
+        public ItemFrameEntity getEntity()
+        {
+            return this.entity;
         }
 
         public static class Pre extends ItemFrame
         {
-            public Pre(ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
+            public Pre(ItemFrameEntity entity, ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
             {
-                super(heldItem, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
+                super(entity, heldItem, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
             }
         }
 
         public static class Post extends ItemFrame
         {
-            public Post(ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
+            public Post(ItemFrameEntity entity, ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
             {
-                super(heldItem, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
+                super(entity, heldItem, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
             }
 
             @Override

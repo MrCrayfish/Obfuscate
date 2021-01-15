@@ -17,17 +17,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ItemFrameRenderer.class)
 public class ItemFrameRendererMixin 
 {
+    private ItemFrameEntity entity;
     private float partialTicks;
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ItemRenderer;renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;IILcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;)V"))
     public void capture(ItemFrameEntity entity, float entityYaw, float partialTicks, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, CallbackInfo ci) 
     {
+        this.entity = entity;
         this.partialTicks = partialTicks;
     }
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ItemRenderer;renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/renderer/model/ItemCameraTransforms$TransformType;IILcom/mojang/blaze3d/matrix/MatrixStack;Lnet/minecraft/client/renderer/IRenderTypeBuffer;)V"))
     public void fireRenderItemFrameItem(ItemRenderer renderer, ItemStack stack, ItemCameraTransforms.TransformType transformType, int light, int overlay, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer) 
     {
-        Hooks.fireRenderItemFrameItem(renderer, stack, transformType, light, overlay, matrixStack, renderTypeBuffer, this.partialTicks);
+        Hooks.fireRenderItemFrameItem(this.entity, renderer, stack, transformType, light, overlay, matrixStack, renderTypeBuffer, this.partialTicks);
     }
 }

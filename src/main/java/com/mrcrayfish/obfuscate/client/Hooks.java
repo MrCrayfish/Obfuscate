@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.item.ItemFrameEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.HandSide;
@@ -67,12 +68,12 @@ public class Hooks
         }
     }
 
-    public static void fireRenderItemFrameItem(ItemRenderer renderer, ItemStack stack, ItemCameraTransforms.TransformType transformType, int light, int overlay, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, float partialTicks)
+    public static void fireRenderItemFrameItem(ItemFrameEntity entity, ItemRenderer renderer, ItemStack stack, ItemCameraTransforms.TransformType transformType, int light, int overlay, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, float partialTicks)
     {
-        if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.ItemFrame.Pre(stack, matrixStack, renderTypeBuffer, light, overlay, partialTicks)))
+        if(!MinecraftForge.EVENT_BUS.post(new RenderItemEvent.ItemFrame.Pre(entity, stack, matrixStack, renderTypeBuffer, light, overlay, partialTicks)))
         {
             renderer.renderItem(stack, transformType, light, overlay, matrixStack, renderTypeBuffer);
-            MinecraftForge.EVENT_BUS.post(new RenderItemEvent.ItemFrame.Post(stack, matrixStack, renderTypeBuffer, light, overlay, partialTicks));
+            MinecraftForge.EVENT_BUS.post(new RenderItemEvent.ItemFrame.Post(entity, stack, matrixStack, renderTypeBuffer, light, overlay, partialTicks));
         }
     }
 
