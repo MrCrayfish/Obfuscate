@@ -109,7 +109,7 @@ public class SyncedDataKey<T>
 
         public SyncedDataKey<T> build()
         {
-            Validate.notNull(this.id, "Missing 'key' when building synced data key");
+            Validate.notNull(this.id, "Missing 'id' when building synced data key");
             Validate.notNull(this.serializer, "Missing 'serializer' when building synced data key");
             Validate.notNull(this.defaultValueSupplier, "Missing 'defaultValueSupplier' when building synced data key");
             SyncedDataKey<T> key = new SyncedDataKey<>(this.id, this.serializer, this.defaultValueSupplier);
