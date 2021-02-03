@@ -287,7 +287,7 @@ public class SyncedPlayerData
         }
     }
 
-    private static class DataHolder
+    public static class DataHolder
     {
         private Map<SyncedDataKey<?>, DataEntry<?>> dataMap = new HashMap<>();
         private boolean dirty = false;
@@ -461,25 +461,25 @@ public class SyncedPlayerData
 
     public static class Provider implements ICapabilitySerializable<ListNBT>
     {
-        final DataHolder INSTANCE = CAPABILITY.getDefaultInstance();
+        final LazyOptional<DataHolder> instance = LazyOptional.of(CAPABILITY::getDefaultInstance);
 
         @Override
         public ListNBT serializeNBT()
         {
-            return (ListNBT) CAPABILITY.getStorage().writeNBT(CAPABILITY, INSTANCE, null);
+            return (ListNBT) CAPABILITY.getStorage().writeNBT(CAPABILITY, this.instance.orElseThrow(NullPointerException::new), null);
         }
 
         @Override
         public void deserializeNBT(ListNBT compound)
         {
-            CAPABILITY.getStorage().readNBT(CAPABILITY, INSTANCE, null, compound);
+            CAPABILITY.getStorage().readNBT(CAPABILITY, this.instance.orElseThrow(NullPointerException::new), null, compound);
         }
 
         @Nonnull
         @Override
         public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side)
         {
-            return CAPABILITY.orEmpty(cap, LazyOptional.of(() -> INSTANCE));
+            return CAPABILITY.orEmpty(cap, this.instance);
         }
     }
 }
