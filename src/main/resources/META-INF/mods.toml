@@ -12,6 +12,8 @@ logoFile="obfuscate.png"
 credits="Cheers to these people for donating during the development: Fabbe50, Infinite Worlds, ALBERT, Mastef Chief, OstenTV, Robert Finley, PlayDashGaming, Shadow Bill-cat"
 authors="MrCrayfish"
 description="A simple library that adds in useful events"
+itemIcon="minecraft:command_block"
+configBackground="minecraft:textures/block/yellow_concrete.png"
 
 [[dependencies.obfuscate]]
     modId="forge"
