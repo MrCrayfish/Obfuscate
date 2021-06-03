@@ -5,7 +5,7 @@ issueTrackerURL="https://github.com/MrCrayfish/Obfuscate/issues"
 
 [[mods]]
 modId="obfuscate"
-version="0.6.1"
+version="0.6.2"
 displayName="Obfuscate"
 updateJSONURL="https://mrcrayfish.com/modupdatejson?id=obfuscate"
 displayURL="https://mrcrayfish.com/mods?id=obfuscate"
