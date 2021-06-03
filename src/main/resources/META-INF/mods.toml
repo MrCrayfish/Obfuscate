@@ -1,19 +1,18 @@
 modLoader="javafml"
 loaderVersion="[32,)"
 license="GNU General Public License 3.0"
+issueTrackerURL="https://github.com/MrCrayfish/Obfuscate/issues"
 
 [[mods]]
 modId="obfuscate"
 version="0.6.1"
 displayName="Obfuscate"
-updateJSONURL="https://raw.githubusercontent.com/MrCrayfish/Obfuscate/master/update.json"
-displayURL="https://mrcrayfish.com/"
+updateJSONURL="https://mrcrayfish.com/modupdatejson?id=obfuscate"
+displayURL="https://mrcrayfish.com/mods?id=obfuscate"
 logoFile="obfuscate.png"
 credits="Cheers to these people for donating during the development: Fabbe50, Infinite Worlds, ALBERT, Mastef Chief, OstenTV, Robert Finley, PlayDashGaming, Shadow Bill-cat"
 authors="MrCrayfish"
 description="A simple library that adds in useful events"
-itemIcon="minecraft:command_block"
-configBackground="minecraft:textures/block/yellow_concrete.png"
 
 [[dependencies.obfuscate]]
     modId="forge"
@@ -27,3 +26,7 @@ configBackground="minecraft:textures/block/yellow_concrete.png"
     versionRange="[1.16.3,1.17)"
     ordering="NONE"
     side="BOTH"
+
+[modproperties.obfuscate]
+    catalogueItemIcon="minecraft:command_block"
+    configuredBackground="minecraft:textures/block/yellow_concrete.png"
