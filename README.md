@@ -81,6 +81,6 @@ repositories {
 }
 
 dependencies {
-    compile fg.deobf('curse.maven:obfuscate:<curseforge_file_id>')
+    compile fg.deobf('curse.maven:obfuscate-289380:<curseforge_file_id>')
 }
 ```
