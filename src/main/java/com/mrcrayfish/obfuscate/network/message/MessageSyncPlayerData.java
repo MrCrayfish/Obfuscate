@@ -1,11 +1,10 @@
 package com.mrcrayfish.obfuscate.network.message;
 
-import com.mrcrayfish.obfuscate.Obfuscate;
 import com.mrcrayfish.obfuscate.client.ClientHandler;
 import com.mrcrayfish.obfuscate.common.data.SyncedPlayerData;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.fmllegacy.network.NetworkDirection;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +27,7 @@ public class MessageSyncPlayerData implements IMessage<MessageSyncPlayerData>
     }
 
     @Override
-    public void encode(MessageSyncPlayerData message, PacketBuffer buffer)
+    public void encode(MessageSyncPlayerData message, FriendlyByteBuf buffer)
     {
         buffer.writeVarInt(message.entityId);
         buffer.writeVarInt(message.entries.size());
@@ -36,7 +35,7 @@ public class MessageSyncPlayerData implements IMessage<MessageSyncPlayerData>
     }
 
     @Override
-    public MessageSyncPlayerData decode(PacketBuffer buffer)
+    public MessageSyncPlayerData decode(FriendlyByteBuf buffer)
     {
         int entityId = buffer.readVarInt();
         int size = buffer.readVarInt();

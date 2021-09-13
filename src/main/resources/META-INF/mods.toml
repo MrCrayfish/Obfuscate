@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[32,)"
+loaderVersion="[37,)"
 license="GNU General Public License 3.0"
 issueTrackerURL="https://github.com/MrCrayfish/Obfuscate/issues"
 
@@ -17,13 +17,13 @@ description="A simple library that adds in useful events"
 [[dependencies.obfuscate]]
     modId="forge"
     mandatory=true
-    versionRange="[34.1.0,)"
+    versionRange="[37.0.59,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.obfuscate]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.3,1.17)"
+    versionRange="[1.17.1,1.18)"
     ordering="NONE"
     side="BOTH"
 

@@ -2,8 +2,8 @@ package com.mrcrayfish.obfuscate.network;
 
 import com.mrcrayfish.obfuscate.Obfuscate;
 import com.mrcrayfish.obfuscate.common.data.SyncedPlayerData;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -28,7 +28,7 @@ class HandshakeHandler
         c.get().setPacketHandled(true);
         if(!SyncedPlayerData.instance().updateMappings(message))
         {
-            c.get().getNetworkManager().closeChannel(new StringTextComponent("Connection closed - [Obfuscate] received unknown synced data key"));
+            c.get().getNetworkManager().disconnect(new TextComponent("Connection closed - [Obfuscate] received unknown synced data key"));
             return;
         }
         PacketHandler.getHandshakeChannel().reply(new HandshakeMessages.C2SAcknowledge(), c.get());

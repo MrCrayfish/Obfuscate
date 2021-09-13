@@ -2,9 +2,9 @@ package com.mrcrayfish.obfuscate.client;
 
 import com.mrcrayfish.obfuscate.common.data.SyncedPlayerData;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
 
@@ -30,13 +30,12 @@ public class ClientHandler
 
     public void updatePlayerData(int entityId, List<SyncedPlayerData.DataEntry<?>> entries)
     {
-        World world = Minecraft.getInstance().world;
-        if(world != null)
+        Level level = Minecraft.getInstance().level;
+        if(level != null)
         {
-            Entity entity = world.getEntityByID(entityId);
-            if(entity instanceof PlayerEntity)
+            Entity entity = level.getEntity(entityId);
+            if(entity instanceof Player player)
             {
-                PlayerEntity player = (PlayerEntity) entity;
                 entries.forEach(entry -> SyncedPlayerData.instance().updateClientEntry(player, entry));
             }
         }

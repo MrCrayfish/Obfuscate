@@ -1,14 +1,13 @@
 package com.mrcrayfish.obfuscate.client.event;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.item.ItemFrameEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.HandSide;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
 
@@ -19,7 +18,7 @@ import java.util.function.Supplier;
  * all rendering events.
  * <p><br>
  * Although it's possible to control rendering of an item using
- * {@link net.minecraft.item.Item.Properties#setISTER(Supplier)}, the location of the render call is
+ * {@link net.minecraft.world.item.Item.Properties#set(Supplier)}, the location of the render call is
  * not guaranteed. These events are hooked into the code at the exact rendering calls rather than
  * relying on the camera transform type.
  * <p><br>
@@ -35,21 +34,21 @@ import java.util.function.Supplier;
 @Cancelable
 public class RenderItemEvent extends Event
 {
-    private ItemStack heldItem;
-    private ItemCameraTransforms.TransformType transformType;
-    private MatrixStack matrixStack;
-    private IRenderTypeBuffer renderTypeBuffer;
-    private float partialTicks;
-    private int light;
-    private int overlay;
+    private final ItemStack heldItem;
+    private final ItemTransforms.TransformType transformType;
+    private final PoseStack poseStack;
+    private final MultiBufferSource source;
+    private final float deltaTicks;
+    private final int light;
+    private final int overlay;
 
-    public RenderItemEvent(ItemStack heldItem, ItemCameraTransforms.TransformType transformType, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
+    public RenderItemEvent(ItemStack heldItem, ItemTransforms.TransformType transformType, PoseStack poseStack, MultiBufferSource source, int light, int overlay, float deltaTicks)
     {
         this.heldItem = heldItem;
         this.transformType = transformType;
-        this.matrixStack = matrixStack;
-        this.renderTypeBuffer = renderTypeBuffer;
-        this.partialTicks = partialTicks;
+        this.poseStack = poseStack;
+        this.source = source;
+        this.deltaTicks = deltaTicks;
         this.light = light;
         this.overlay = overlay;
     }
@@ -65,7 +64,7 @@ public class RenderItemEvent extends Event
     /**
      * Gets the transform type of the render
      */
-    public ItemCameraTransforms.TransformType getTransformType()
+    public ItemTransforms.TransformType getTransformType()
     {
         return this.transformType;
     }
@@ -73,17 +72,17 @@ public class RenderItemEvent extends Event
     /**
      * Gets the current matrix stack
      */
-    public MatrixStack getMatrixStack()
+    public PoseStack getPoseStack()
     {
-        return this.matrixStack;
+        return this.poseStack;
     }
 
     /**
      * Gets an instance of the render type buffer
      */
-    public IRenderTypeBuffer getRenderTypeBuffer()
+    public MultiBufferSource getMultiBufferSource()
     {
-        return this.renderTypeBuffer;
+        return this.source;
     }
 
     /**
@@ -107,7 +106,7 @@ public class RenderItemEvent extends Event
      */
     public float getPartialTicks()
     {
-        return this.partialTicks;
+        return this.deltaTicks;
     }
 
     /**
@@ -118,14 +117,14 @@ public class RenderItemEvent extends Event
     @Cancelable
     public static class Held extends RenderItemEvent
     {
-        private LivingEntity entity;
-        private HandSide handSide;
+        private final LivingEntity entity;
+        private final HumanoidArm arm;
 
-        public Held(LivingEntity entity, ItemStack heldItem, ItemCameraTransforms.TransformType transformType, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, HandSide handSide, int light, int overlay, float partialTicks)
+        public Held(LivingEntity entity, ItemStack heldItem, ItemTransforms.TransformType transformType, PoseStack poseStack, MultiBufferSource source, HumanoidArm arm, int light, int overlay, float deltaTicks)
         {
-            super(heldItem, transformType, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
+            super(heldItem, transformType, poseStack, source, light, overlay, deltaTicks);
             this.entity = entity;
-            this.handSide = handSide;
+            this.arm = arm;
         }
 
         /**
@@ -139,9 +138,9 @@ public class RenderItemEvent extends Event
         /**
          * Gets the hand side that is holding the item
          */
-        public HandSide getHandSide()
+        public HumanoidArm getArm()
         {
-            return this.handSide;
+            return this.arm;
         }
 
         /**
@@ -151,9 +150,9 @@ public class RenderItemEvent extends Event
          */
         public static class Pre extends Held
         {
-            public Pre(LivingEntity entity, ItemStack heldItem, ItemCameraTransforms.TransformType transformType, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, HandSide handSide, int light, int overlay, float partialTicks)
+            public Pre(LivingEntity entity, ItemStack heldItem, ItemTransforms.TransformType transformType, PoseStack poseStack, MultiBufferSource source, HumanoidArm HumanoidArm, int light, int overlay, float deltaTicks)
             {
-                super(entity, heldItem, transformType, matrixStack, renderTypeBuffer, handSide, light, overlay, partialTicks);
+                super(entity, heldItem, transformType, poseStack, source, HumanoidArm, light, overlay, deltaTicks);
             }
         }
 
@@ -163,9 +162,9 @@ public class RenderItemEvent extends Event
          */
         public static class Post extends Held
         {
-            public Post(LivingEntity entity, ItemStack heldItem, ItemCameraTransforms.TransformType transformType, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, HandSide handSide, int light, int overlay, float partialTicks)
+            public Post(LivingEntity entity, ItemStack heldItem, ItemTransforms.TransformType transformType, PoseStack poseStack, MultiBufferSource source, HumanoidArm HumanoidArm, int light, int overlay, float deltaTicks)
             {
-                super(entity, heldItem, transformType, matrixStack, renderTypeBuffer, handSide, light, overlay, partialTicks);
+                super(entity, heldItem, transformType, poseStack, source, HumanoidArm, light, overlay, deltaTicks);
             }
 
             @Override
@@ -183,11 +182,11 @@ public class RenderItemEvent extends Event
     @Cancelable
     public static class Entity extends RenderItemEvent
     {
-        private ItemEntity entity;
+        private final ItemEntity entity;
 
-        public Entity(ItemEntity entity, ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
+        public Entity(ItemEntity entity, ItemStack heldItem, PoseStack poseStack, MultiBufferSource source, int light, int overlay, float deltaTicks)
         {
-            super(heldItem, ItemCameraTransforms.TransformType.GROUND, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
+            super(heldItem, ItemTransforms.TransformType.GROUND, poseStack, source, light, overlay, deltaTicks);
             this.entity = entity;
         }
 
@@ -206,9 +205,9 @@ public class RenderItemEvent extends Event
          */
         public static class Pre extends Entity
         {
-            public Pre(ItemEntity entity, ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
+            public Pre(ItemEntity entity, ItemStack heldItem, PoseStack poseStack, MultiBufferSource source, int light, int overlay, float deltaTicks)
             {
-                super(entity, heldItem, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
+                super(entity, heldItem, poseStack, source, light, overlay, deltaTicks);
             }
         }
 
@@ -218,9 +217,9 @@ public class RenderItemEvent extends Event
          */
         public static class Post extends Entity
         {
-            public Post(ItemEntity entity, ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
+            public Post(ItemEntity entity, ItemStack heldItem, PoseStack poseStack, MultiBufferSource source, int light, int overlay, float deltaTicks)
             {
-                super(entity, heldItem, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
+                super(entity, heldItem, poseStack, source, light, overlay, deltaTicks);
             }
 
             @Override
@@ -238,9 +237,9 @@ public class RenderItemEvent extends Event
     @Cancelable
     public static class Gui extends RenderItemEvent
     {
-        public Gui(ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay)
+        public Gui(ItemStack heldItem, PoseStack poseStack, MultiBufferSource source, int light, int overlay)
         {
-            super(heldItem, ItemCameraTransforms.TransformType.GUI, matrixStack, renderTypeBuffer, light, overlay, Minecraft.getInstance().getRenderPartialTicks());
+            super(heldItem, ItemTransforms.TransformType.GUI, poseStack, source, light, overlay, Minecraft.getInstance().getDeltaFrameTime());
         }
 
         /**
@@ -250,9 +249,9 @@ public class RenderItemEvent extends Event
          */
         public static class Pre extends Gui
         {
-            public Pre(ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay)
+            public Pre(ItemStack heldItem, PoseStack poseStack, MultiBufferSource source, int light, int overlay)
             {
-                super(heldItem, matrixStack, renderTypeBuffer, light, overlay);
+                super(heldItem, poseStack, source, light, overlay);
             }
         }
 
@@ -262,9 +261,9 @@ public class RenderItemEvent extends Event
          */
         public static class Post extends Gui
         {
-            public Post(ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay)
+            public Post(ItemStack heldItem, PoseStack poseStack, MultiBufferSource source, int light, int overlay)
             {
-                super(heldItem, matrixStack, renderTypeBuffer, light, overlay);
+                super(heldItem, poseStack, source, light, overlay);
             }
 
             @Override
@@ -282,18 +281,18 @@ public class RenderItemEvent extends Event
     @Cancelable
     public static class ItemFrame extends RenderItemEvent
     {
-        private ItemFrameEntity entity;
+        private final net.minecraft.world.entity.decoration.ItemFrame entity;
 
-        public ItemFrame(ItemFrameEntity entity, ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
+        public ItemFrame(net.minecraft.world.entity.decoration.ItemFrame entity, ItemStack heldItem, PoseStack poseStack, MultiBufferSource source, int light, int overlay, float deltaTicks)
         {
-            super(heldItem, ItemCameraTransforms.TransformType.FIXED, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
+            super(heldItem, ItemTransforms.TransformType.FIXED, poseStack, source, light, overlay, deltaTicks);
             this.entity = entity;
         }
 
         /**
          * Gets the item frame entity that is holding the item
          */
-        public ItemFrameEntity getEntity()
+        public net.minecraft.world.entity.decoration.ItemFrame getEntity()
         {
             return this.entity;
         }
@@ -305,9 +304,9 @@ public class RenderItemEvent extends Event
          */
         public static class Pre extends ItemFrame
         {
-            public Pre(ItemFrameEntity entity, ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
+            public Pre(net.minecraft.world.entity.decoration.ItemFrame entity, ItemStack heldItem, PoseStack poseStack, MultiBufferSource source, int light, int overlay, float deltaTicks)
             {
-                super(entity, heldItem, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
+                super(entity, heldItem, poseStack, source, light, overlay, deltaTicks);
             }
         }
 
@@ -317,9 +316,9 @@ public class RenderItemEvent extends Event
          */
         public static class Post extends ItemFrame
         {
-            public Post(ItemFrameEntity entity, ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
+            public Post(net.minecraft.world.entity.decoration.ItemFrame entity, ItemStack heldItem, PoseStack poseStack, MultiBufferSource source, int light, int overlay, float deltaTicks)
             {
-                super(entity, heldItem, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
+                super(entity, heldItem, poseStack, source, light, overlay, deltaTicks);
             }
 
             @Override
@@ -338,11 +337,11 @@ public class RenderItemEvent extends Event
     @Cancelable
     public static class Head extends RenderItemEvent
     {
-        private LivingEntity entity;
+        private final LivingEntity entity;
 
-        public Head(LivingEntity entity, ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
+        public Head(LivingEntity entity, ItemStack heldItem, PoseStack poseStack, MultiBufferSource source, int light, int overlay, float deltaTicks)
         {
-            super(heldItem, ItemCameraTransforms.TransformType.FIXED, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
+            super(heldItem, ItemTransforms.TransformType.FIXED, poseStack, source, light, overlay, deltaTicks);
             this.entity = entity;
         }
 
@@ -361,9 +360,9 @@ public class RenderItemEvent extends Event
          */
         public static class Pre extends Head
         {
-            public Pre(LivingEntity entity, ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
+            public Pre(LivingEntity entity, ItemStack heldItem, PoseStack poseStack, MultiBufferSource source, int light, int overlay, float deltaTicks)
             {
-                super(entity, heldItem, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
+                super(entity, heldItem, poseStack, source, light, overlay, deltaTicks);
             }
         }
 
@@ -373,9 +372,9 @@ public class RenderItemEvent extends Event
          */
         public static class Post extends Head
         {
-            public Post(LivingEntity entity, ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay, float partialTicks)
+            public Post(LivingEntity entity, ItemStack heldItem, PoseStack poseStack, MultiBufferSource source, int light, int overlay, float deltaTicks)
             {
-                super(entity, heldItem, matrixStack, renderTypeBuffer, light, overlay, partialTicks);
+                super(entity, heldItem, poseStack, source, light, overlay, deltaTicks);
             }
 
             @Override

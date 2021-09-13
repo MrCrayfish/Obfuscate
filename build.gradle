@@ -2,16 +2,16 @@ buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
         maven { url = 'https://repo.spongepowered.org/maven' }
-        jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'maven-publish'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 // apply plugin: 'eclipse'
 
@@ -19,14 +19,14 @@ version = '0.6.2-1.16.3'
 group = 'com.mrcrayfish' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'obfuscate'
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 
 mixin {
     add sourceSets.main, "obfuscate.refmap.json"
 }
 
 minecraft {
-    mappings channel: 'snapshot', version: '20201028-1.16.3'
+    mappings channel: 'official', version: '1.17.1'
 
     runs {
         client {
@@ -68,7 +68,7 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.3-34.1.0'
+    minecraft 'net.minecraftforge:forge:1.17.1-37.0.59'
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -97,23 +97,17 @@ if(file.exists()) {
     ins.close()
 }
 
-import net.minecraftforge.gradle.common.task.SignJar
+jar.finalizedBy('reobfJar')
 
-task signJar(type: SignJar, dependsOn: jar) {
-    onlyIf {
-        keyStoreProperties.containsKey('keyStore')
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+        }
     }
-    alias = keyStoreProperties.getProperty('alias')
-    storePass = keyStoreProperties.getProperty('storePass')
-    keyPass = keyStoreProperties.getProperty('keyPass')
-    keyStore = keyStoreProperties.getProperty('keyStore')
-    inputFile = jar.archivePath
-    outputFile = jar.archivePath
+    repositories {
+        maven {
+            url "file://${project.projectDir}/mcmodsrepo"
+        }
+    }
 }
-
-task sourcesJar(type: Jar) {
-    classifier = "sources"
-    from sourceSets.main.allJava
-}
-
-tasks.build.dependsOn signJar, sourcesJar

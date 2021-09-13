@@ -1,6 +1,6 @@
 package com.mrcrayfish.obfuscate.common.data;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.Validate;
 
 import java.util.Objects;

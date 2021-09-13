@@ -1,9 +1,9 @@
 package com.mrcrayfish.obfuscate.client.event;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.renderer.entity.model.PlayerModel;
-import net.minecraft.entity.player.PlayerEntity;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.Cancelable;
 
@@ -14,15 +14,15 @@ import net.minecraftforge.eventbus.api.Cancelable;
  */
 public abstract class PlayerModelEvent extends PlayerEvent
 {
-    private PlayerModel modelPlayer;
-    private float partialTicks;
-    private float limbSwing;
-    private float limbSwingAmount;
-    private float ageInTicks;
-    private float netHeadYaw;
-    private float headPitch;
+    private final PlayerModel modelPlayer;
+    private final float deltaTicks;
+    private final float limbSwing;
+    private final float limbSwingAmount;
+    private final float ageInTicks;
+    private final float netHeadYaw;
+    private final float headPitch;
 
-    private PlayerModelEvent(PlayerEntity player, PlayerModel modelPlayer, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float partialTicks)
+    private PlayerModelEvent(Player player, PlayerModel modelPlayer, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float deltaTicks)
     {
         super(player);
         this.modelPlayer = modelPlayer;
@@ -31,7 +31,7 @@ public abstract class PlayerModelEvent extends PlayerEvent
         this.ageInTicks = ageInTicks;
         this.netHeadYaw = netHeadYaw;
         this.headPitch = headPitch;
-        this.partialTicks = partialTicks;
+        this.deltaTicks = deltaTicks;
     }
 
     /**
@@ -85,9 +85,9 @@ public abstract class PlayerModelEvent extends PlayerEvent
     /**
      * Gets the partial ticks of the current render
      */
-    public float getPartialTicks()
+    public float getDeltaTicks()
     {
-        return this.partialTicks;
+        return this.deltaTicks;
     }
 
     /**
@@ -99,9 +99,9 @@ public abstract class PlayerModelEvent extends PlayerEvent
     @Cancelable
     public static class SetupAngles extends PlayerModelEvent
     {
-        private SetupAngles(PlayerEntity player, PlayerModel modelPlayer, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float partialTicks)
+        private SetupAngles(Player player, PlayerModel modelPlayer, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float deltaTicks)
         {
-            super(player, modelPlayer, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, partialTicks);
+            super(player, modelPlayer, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, deltaTicks);
         }
 
         /**
@@ -113,9 +113,9 @@ public abstract class PlayerModelEvent extends PlayerEvent
          */
         public static class Pre extends SetupAngles
         {
-            public Pre(PlayerEntity player, PlayerModel modelPlayer, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float partialTicks)
+            public Pre(Player player, PlayerModel modelPlayer, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float deltaTicks)
             {
-                super(player, modelPlayer, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, partialTicks);
+                super(player, modelPlayer, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, deltaTicks);
             }
         }
 
@@ -128,9 +128,9 @@ public abstract class PlayerModelEvent extends PlayerEvent
          */
         public static class Post extends SetupAngles
         {
-            public Post(PlayerEntity player, PlayerModel modelPlayer, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float partialTicks)
+            public Post(Player player, PlayerModel modelPlayer, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float deltaTicks)
             {
-                super(player, modelPlayer, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, partialTicks);
+                super(player, modelPlayer, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, deltaTicks);
             }
 
             @Override
@@ -148,16 +148,16 @@ public abstract class PlayerModelEvent extends PlayerEvent
     @Cancelable
     public static class Render extends PlayerModelEvent
     {
-        private MatrixStack matrixStack;
-        private IVertexBuilder builder;
-        private int light;
-        private int overlay;
+        private final PoseStack poseStack;
+        private final VertexConsumer consumer;
+        private final int light;
+        private final int overlay;
 
-        private Render(PlayerEntity player, PlayerModel modelPlayer, MatrixStack matrixStack, IVertexBuilder builder, int light, int overlay, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float partialTicks)
+        private Render(Player player, PlayerModel modelPlayer, PoseStack poseStack, VertexConsumer consumer, int light, int overlay, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float deltaTicks)
         {
-            super(player, modelPlayer, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, partialTicks);
-            this.matrixStack = matrixStack;
-            this.builder = builder;
+            super(player, modelPlayer, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, deltaTicks);
+            this.poseStack = poseStack;
+            this.consumer = consumer;
             this.light = light;
             this.overlay = overlay;
         }
@@ -169,9 +169,9 @@ public abstract class PlayerModelEvent extends PlayerEvent
          */
         public static class Pre extends Render
         {
-            public Pre(PlayerEntity player, PlayerModel modelPlayer, MatrixStack matrixStack, IVertexBuilder builder, int light, int overlay, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float partialTicks)
+            public Pre(Player player, PlayerModel modelPlayer, PoseStack poseStack, VertexConsumer consumer, int light, int overlay, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float deltaTicks)
             {
-                super(player, modelPlayer, matrixStack, builder, light, overlay, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, partialTicks);
+                super(player, modelPlayer, poseStack, consumer, light, overlay, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, deltaTicks);
             }
         }
 
@@ -182,9 +182,9 @@ public abstract class PlayerModelEvent extends PlayerEvent
          */
         public static class Post extends Render
         {
-            public Post(PlayerEntity player, PlayerModel modelPlayer, MatrixStack matrixStack, IVertexBuilder builder, int light, int overlay, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float partialTicks)
+            public Post(Player player, PlayerModel modelPlayer, PoseStack poseStack, VertexConsumer consumer, int light, int overlay, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float deltaTicks)
             {
-                super(player, modelPlayer, matrixStack, builder, light, overlay, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, partialTicks);
+                super(player, modelPlayer, poseStack, consumer, light, overlay, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, deltaTicks);
             }
 
             @Override
@@ -197,17 +197,17 @@ public abstract class PlayerModelEvent extends PlayerEvent
         /**
          * Gets the current matrix stack
          */
-        public MatrixStack getMatrixStack()
+        public PoseStack getPoseStack()
         {
-            return this.matrixStack;
+            return this.poseStack;
         }
 
         /**
          * Gets the vertex builder for building entity models
          */
-        public IVertexBuilder getBuilder()
+        public VertexConsumer getVertexConsumer()
         {
-            return this.builder;
+            return this.consumer;
         }
 
         /**

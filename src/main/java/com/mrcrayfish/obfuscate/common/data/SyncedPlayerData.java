@@ -5,29 +5,28 @@ import com.mrcrayfish.obfuscate.Reference;
 import com.mrcrayfish.obfuscate.network.HandshakeMessages;
 import com.mrcrayfish.obfuscate.network.PacketHandler;
 import com.mrcrayfish.obfuscate.network.message.MessageSyncPlayerData;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
 import org.apache.commons.lang3.Validate;
 
 import javax.annotation.Nonnull;
@@ -66,7 +65,6 @@ public class SyncedPlayerData
     public static final Capability<DataHolder> CAPABILITY = null;
 
     private static SyncedPlayerData instance;
-    private static boolean init = false;
 
     private final Map<ResourceLocation, SyncedDataKey<?>> registeredDataKeys = new HashMap<>();
     private final Map<Integer, SyncedDataKey<?>> idToDataKey = new HashMap<>();
@@ -84,14 +82,9 @@ public class SyncedPlayerData
         return instance;
     }
 
-    public static void init()
+    public static void onRegisterCapability(RegisterCapabilitiesEvent event)
     {
-        if(!init)
-        {
-            CapabilityManager.INSTANCE.register(DataHolder.class, new Storage(), DataHolder::new);
-            MinecraftForge.EVENT_BUS.register(instance());
-            init = true;
-        }
+        event.register(DataHolder.class);
     }
 
     /**
@@ -118,7 +111,7 @@ public class SyncedPlayerData
      * @param key    a registered synced data key
      * @param value  a new value that matches the synced data key type
      */
-    public <T> void set(PlayerEntity player, SyncedDataKey<T> key, T value)
+    public <T> void set(Player player, SyncedDataKey<T> key, T value)
     {
         if(!this.registeredDataKeys.values().contains(key))
         {
@@ -127,7 +120,7 @@ public class SyncedPlayerData
         DataHolder holder = this.getDataHolder(player);
         if(holder != null && holder.set(player, key, value))
         {
-            if(!player.world.isRemote)
+            if(!player.level.isClientSide())
             {
                 this.dirty = true;
             }
@@ -141,7 +134,7 @@ public class SyncedPlayerData
      * @param player the player to retrieve the data from
      * @param key    a registered synced data key
      */
-    public <T> T get(PlayerEntity player, SyncedDataKey<T> key)
+    public <T> T get(Player player, SyncedDataKey<T> key)
     {
         if(!this.registeredDataKeys.values().contains(key))
         {
@@ -152,7 +145,7 @@ public class SyncedPlayerData
     }
 
     @OnlyIn(Dist.CLIENT)
-    public <T> void updateClientEntry(PlayerEntity player, SyncedPlayerData.DataEntry<T> entry)
+    public <T> void updateClientEntry(Player player, SyncedPlayerData.DataEntry<T> entry)
     {
         SyncedPlayerData.instance().set(player, entry.getKey(), entry.getValue());
     }
@@ -169,7 +162,7 @@ public class SyncedPlayerData
     }
 
     @Nullable
-    private DataHolder getDataHolder(PlayerEntity player)
+    private DataHolder getDataHolder(Player player)
     {
         return player.getCapability(CAPABILITY, null).orElse(null);
     }
@@ -177,7 +170,7 @@ public class SyncedPlayerData
     @SubscribeEvent
     public void attachCapabilities(AttachCapabilitiesEvent<Entity> event)
     {
-        if(event.getObject() instanceof PlayerEntity)
+        if(event.getObject() instanceof Player)
         {
             event.addCapability(new ResourceLocation(Reference.MOD_ID, "synced_player_data"), new Provider());
         }
@@ -186,9 +179,9 @@ public class SyncedPlayerData
     @SubscribeEvent
     public void onStartTracking(PlayerEvent.StartTracking event)
     {
-        if(event.getTarget() instanceof PlayerEntity && !event.getPlayer().world.isRemote)
+        if(event.getTarget() instanceof Player && !event.getPlayer().level.isClientSide())
         {
-            PlayerEntity player = (PlayerEntity) event.getTarget();
+            Player player = (Player) event.getTarget();
             DataHolder holder = this.getDataHolder(player);
             if(holder != null)
             {
@@ -196,7 +189,7 @@ public class SyncedPlayerData
                 entries.removeIf(entry -> !entry.getKey().shouldSyncToAllPlayers());
                 if(!entries.isEmpty())
                 {
-                    PacketHandler.getPlayChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) event.getPlayer()), new MessageSyncPlayerData(player.getEntityId(), entries));
+                    PacketHandler.getPlayChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) event.getPlayer()), new MessageSyncPlayerData(player.getId(), entries));
                 }
             }
         }
@@ -206,16 +199,15 @@ public class SyncedPlayerData
     public void onPlayerJoinWorld(EntityJoinWorldEvent event)
     {
         Entity entity = event.getEntity();
-        if(entity instanceof PlayerEntity && !event.getWorld().isRemote)
+        if(entity instanceof Player player && !event.getWorld().isClientSide())
         {
-            PlayerEntity player = (PlayerEntity) entity;
             DataHolder holder = this.getDataHolder(player);
             if(holder != null)
             {
                 List<SyncedPlayerData.DataEntry<?>> entries = holder.gatherAll();
                 if(!entries.isEmpty())
                 {
-                    PacketHandler.getPlayChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), new MessageSyncPlayerData(player.getEntityId(), entries));
+                    PacketHandler.getPlayChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), new MessageSyncPlayerData(player.getId(), entries));
                 }
             }
         }
@@ -224,10 +216,10 @@ public class SyncedPlayerData
     @SubscribeEvent
     public void onPlayerClone(PlayerEvent.Clone event)
     {
-        PlayerEntity original = event.getOriginal();
-        if(!original.world.isRemote)
+        Player original = event.getOriginal();
+        if(!original.level.isClientSide())
         {
-            PlayerEntity player = event.getPlayer();
+            Player player = event.getPlayer();
             DataHolder oldHolder = this.getDataHolder(original);
             if(oldHolder != null)
             {
@@ -252,8 +244,8 @@ public class SyncedPlayerData
         {
             if(this.dirty)
             {
-                PlayerEntity player = event.player;
-                if(!player.world.isRemote())
+                Player player = event.player;
+                if(!player.level.isClientSide())
                 {
                     DataHolder holder = this.getDataHolder(player);
                     if(holder != null && holder.isDirty())
@@ -261,11 +253,11 @@ public class SyncedPlayerData
                         List<SyncedPlayerData.DataEntry<?>> entries = holder.gatherDirty();
                         if(!entries.isEmpty())
                         {
-                            PacketHandler.getPlayChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), new MessageSyncPlayerData(player.getEntityId(), entries));
+                            PacketHandler.getPlayChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), new MessageSyncPlayerData(player.getId(), entries));
                             List<SyncedPlayerData.DataEntry<?>> syncToAllEntries = entries.stream().filter(entry -> entry.getKey().shouldSyncToAllPlayers()).collect(Collectors.toList());
                             if(!syncToAllEntries.isEmpty())
                             {
-                                PacketHandler.getPlayChannel().send(PacketDistributor.TRACKING_ENTITY.with(() -> player), new MessageSyncPlayerData(player.getEntityId(), syncToAllEntries));
+                                PacketHandler.getPlayChannel().send(PacketDistributor.TRACKING_ENTITY.with(() -> player), new MessageSyncPlayerData(player.getId(), syncToAllEntries));
                             }
                         }
                         holder.clean();
@@ -293,12 +285,12 @@ public class SyncedPlayerData
         private boolean dirty = false;
 
         @SuppressWarnings("unchecked")
-        private <T> boolean set(PlayerEntity player, SyncedDataKey<T> key, T value)
+        private <T> boolean set(Player player, SyncedDataKey<T> key, T value)
         {
             DataEntry<T> entry = (DataEntry<T>) this.dataMap.computeIfAbsent(key, DataEntry::new);
             if(!entry.getValue().equals(value))
             {
-                boolean dirty = !player.world.isRemote && entry.getKey().shouldSyncToClient();
+                boolean dirty = !player.level.isClientSide() && entry.getKey().shouldSyncToClient();
                 entry.setValue(value, dirty);
                 this.dirty = dirty;
                 return true;
@@ -373,13 +365,13 @@ public class SyncedPlayerData
             this.dirty = false;
         }
 
-        public void write(PacketBuffer buffer)
+        public void write(FriendlyByteBuf buffer)
         {
             buffer.writeVarInt(this.key.getId());
             this.key.getSerializer().write(buffer, this.value);
         }
 
-        public static DataEntry<?> read(PacketBuffer buffer)
+        public static DataEntry<?> read(FriendlyByteBuf buffer)
         {
             SyncedDataKey<?> key = SyncedPlayerData.instance().getKey(buffer.readVarInt());
             Validate.notNull(key, "Synced key does not exist for id");
@@ -388,17 +380,17 @@ public class SyncedPlayerData
             return entry;
         }
 
-        private void readValue(PacketBuffer buffer)
+        private void readValue(FriendlyByteBuf buffer)
         {
             this.value = this.getKey().getSerializer().read(buffer);
         }
 
-        private INBT writeValue()
+        private Tag writeValue()
         {
             return this.key.getSerializer().write(this.value);
         }
 
-        private void readValue(INBT nbt)
+        private void readValue(Tag nbt)
         {
             this.value = this.key.getSerializer().read(nbt);
         }
@@ -419,18 +411,20 @@ public class SyncedPlayerData
         return true;
     }
 
-    public static class Storage implements Capability.IStorage<DataHolder>
+    public static class Provider implements ICapabilitySerializable<ListTag>
     {
-        @Nullable
+        final DataHolder holder = new DataHolder();
+        final LazyOptional<DataHolder> optional = LazyOptional.of(() -> this.holder);
+
         @Override
-        public INBT writeNBT(Capability<DataHolder> capability, DataHolder instance, Direction side)
+        public ListTag serializeNBT()
         {
-            ListNBT list = new ListNBT();
-            instance.dataMap.forEach((key, entry) ->
+            ListTag list = new ListTag();
+            this.holder.dataMap.forEach((key, entry) ->
             {
                 if(key.shouldSave())
                 {
-                    CompoundNBT keyTag = new CompoundNBT();
+                    CompoundTag keyTag = new CompoundTag();
                     keyTag.putString("Key", key.getKey().toString());
                     keyTag.put("Value", entry.writeValue());
                     list.add(keyTag);
@@ -440,46 +434,30 @@ public class SyncedPlayerData
         }
 
         @Override
-        public void readNBT(Capability<DataHolder> capability, DataHolder instance, Direction side, INBT nbt)
+        public void deserializeNBT(ListTag listTag)
         {
-            ListNBT list = (ListNBT) nbt;
-            list.forEach(entryTag ->
+            this.holder.dataMap.clear();
+            listTag.forEach(entryTag ->
             {
-                CompoundNBT keyTag = (CompoundNBT) entryTag;
-                ResourceLocation key = ResourceLocation.tryCreate(keyTag.getString("Key"));
-                INBT value = keyTag.get("Value");
+                CompoundTag keyTag = (CompoundTag) entryTag;
+                ResourceLocation key = ResourceLocation.tryParse(keyTag.getString("Key"));
+                Tag value = keyTag.get("Value");
                 SyncedDataKey<?> syncedDataKey = SyncedPlayerData.instance().registeredDataKeys.get(key);
                 if(syncedDataKey != null && syncedDataKey.shouldSave())
                 {
                     DataEntry<?> entry = new DataEntry<>(syncedDataKey);
                     entry.readValue(value);
-                    instance.dataMap.put(syncedDataKey, entry);
+                    this.holder.dataMap.put(syncedDataKey, entry);
                 }
             });
-        }
-    }
-
-    public static class Provider implements ICapabilitySerializable<ListNBT>
-    {
-        final LazyOptional<DataHolder> instance = LazyOptional.of(CAPABILITY::getDefaultInstance);
-
-        @Override
-        public ListNBT serializeNBT()
-        {
-            return (ListNBT) CAPABILITY.getStorage().writeNBT(CAPABILITY, this.instance.orElseThrow(NullPointerException::new), null);
-        }
-
-        @Override
-        public void deserializeNBT(ListNBT compound)
-        {
-            CAPABILITY.getStorage().readNBT(CAPABILITY, this.instance.orElseThrow(NullPointerException::new), null, compound);
         }
 
         @Nonnull
         @Override
+        @SuppressWarnings("ConstantConditions")
         public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side)
         {
-            return CAPABILITY.orEmpty(cap, this.instance);
+            return CAPABILITY.orEmpty(cap, this.optional);
         }
     }
 }

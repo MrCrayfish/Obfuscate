@@ -1,10 +1,18 @@
 package com.mrcrayfish.obfuscate.common.data;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.*;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.ByteTag;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.DoubleTag;
+import net.minecraft.nbt.FloatTag;
+import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.LongTag;
+import net.minecraft.nbt.ShortTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.UUID;
 
@@ -13,385 +21,385 @@ import java.util.UUID;
  */
 public class Serializers
 {
-    public static final IDataSerializer<Boolean> BOOLEAN = new IDataSerializer<Boolean>()
+    public static final IDataSerializer<Boolean> BOOLEAN = new IDataSerializer<>()
     {
         @Override
-        public void write(PacketBuffer buf, Boolean value)
+        public void write(FriendlyByteBuf buf, Boolean value)
         {
             buf.writeBoolean(value);
         }
 
         @Override
-        public Boolean read(PacketBuffer buf)
+        public Boolean read(FriendlyByteBuf buf)
         {
             return buf.readBoolean();
         }
 
         @Override
-        public INBT write(Boolean value)
+        public Tag write(Boolean value)
         {
-            return ByteNBT.valueOf(value);
+            return ByteTag.valueOf(value);
         }
 
         @Override
-        public Boolean read(INBT nbt)
+        public Boolean read(Tag tag)
         {
-            return ((ByteNBT) nbt).getByte() != 0;
+            return ((ByteTag) tag).getAsByte() != 0;
         }
     };
 
-    public static final IDataSerializer<Byte> BYTE = new IDataSerializer<Byte>()
+    public static final IDataSerializer<Byte> BYTE = new IDataSerializer<>()
     {
         @Override
-        public void write(PacketBuffer buf, Byte value)
+        public void write(FriendlyByteBuf buf, Byte value)
         {
             buf.writeByte(value);
         }
 
         @Override
-        public Byte read(PacketBuffer buf)
+        public Byte read(FriendlyByteBuf buf)
         {
             return buf.readByte();
         }
 
         @Override
-        public INBT write(Byte value)
+        public Tag write(Byte value)
         {
-            return ByteNBT.valueOf(value);
+            return ByteTag.valueOf(value);
         }
 
         @Override
-        public Byte read(INBT nbt)
+        public Byte read(Tag tag)
         {
-            return ((ByteNBT) nbt).getByte();
+            return ((ByteTag) tag).getAsByte();
         }
     };
 
-    public static final IDataSerializer<Short> SHORT = new IDataSerializer<Short>()
+    public static final IDataSerializer<Short> SHORT = new IDataSerializer<>()
     {
         @Override
-        public void write(PacketBuffer buf, Short value)
+        public void write(FriendlyByteBuf buf, Short value)
         {
             buf.writeShort(value);
         }
 
         @Override
-        public Short read(PacketBuffer buf)
+        public Short read(FriendlyByteBuf buf)
         {
             return buf.readShort();
         }
 
         @Override
-        public INBT write(Short value)
+        public Tag write(Short value)
         {
-            return ShortNBT.valueOf(value);
+            return ShortTag.valueOf(value);
         }
 
         @Override
-        public Short read(INBT nbt)
+        public Short read(Tag tag)
         {
-            return ((ShortNBT) nbt).getShort();
+            return ((ShortTag) tag).getAsShort();
         }
     };
 
-    public static final IDataSerializer<Integer> INTEGER = new IDataSerializer<Integer>()
+    public static final IDataSerializer<Integer> INTEGER = new IDataSerializer<>()
     {
         @Override
-        public void write(PacketBuffer buf, Integer value)
+        public void write(FriendlyByteBuf buf, Integer value)
         {
             buf.writeVarInt(value);
         }
 
         @Override
-        public Integer read(PacketBuffer buf)
+        public Integer read(FriendlyByteBuf buf)
         {
             return buf.readVarInt();
         }
 
         @Override
-        public INBT write(Integer value)
+        public Tag write(Integer value)
         {
-            return IntNBT.valueOf(value);
+            return IntTag.valueOf(value);
         }
 
         @Override
-        public Integer read(INBT nbt)
+        public Integer read(Tag tag)
         {
-            return ((IntNBT) nbt).getInt();
+            return ((IntTag) tag).getAsInt();
         }
     };
 
-    public static final IDataSerializer<Long> LONG = new IDataSerializer<Long>()
+    public static final IDataSerializer<Long> LONG = new IDataSerializer<>()
     {
         @Override
-        public void write(PacketBuffer buf, Long value)
+        public void write(FriendlyByteBuf buf, Long value)
         {
             buf.writeLong(value);
         }
 
         @Override
-        public Long read(PacketBuffer buf)
+        public Long read(FriendlyByteBuf buf)
         {
             return buf.readLong();
         }
 
         @Override
-        public INBT write(Long value)
+        public Tag write(Long value)
         {
-            return LongNBT.valueOf(value);
+            return LongTag.valueOf(value);
         }
 
         @Override
-        public Long read(INBT nbt)
+        public Long read(Tag tag)
         {
-            return ((LongNBT) nbt).getLong();
+            return ((LongTag) tag).getAsLong();
         }
     };
 
-    public static final IDataSerializer<Float> FLOAT = new IDataSerializer<Float>()
+    public static final IDataSerializer<Float> FLOAT = new IDataSerializer<>()
     {
         @Override
-        public void write(PacketBuffer buf, Float value)
+        public void write(FriendlyByteBuf buf, Float value)
         {
             buf.writeFloat(value);
         }
 
         @Override
-        public Float read(PacketBuffer buf)
+        public Float read(FriendlyByteBuf buf)
         {
             return buf.readFloat();
         }
 
         @Override
-        public INBT write(Float value)
+        public Tag write(Float value)
         {
-            return FloatNBT.valueOf(value);
+            return FloatTag.valueOf(value);
         }
 
         @Override
-        public Float read(INBT nbt)
+        public Float read(Tag tag)
         {
-            return ((FloatNBT) nbt).getFloat();
+            return ((FloatTag) tag).getAsFloat();
         }
     };
 
-    public static final IDataSerializer<Double> DOUBLE = new IDataSerializer<Double>()
+    public static final IDataSerializer<Double> DOUBLE = new IDataSerializer<>()
     {
         @Override
-        public void write(PacketBuffer buf, Double value)
+        public void write(FriendlyByteBuf buf, Double value)
         {
             buf.writeDouble(value);
         }
 
         @Override
-        public Double read(PacketBuffer buf)
+        public Double read(FriendlyByteBuf buf)
         {
             return buf.readDouble();
         }
 
         @Override
-        public INBT write(Double value)
+        public Tag write(Double value)
         {
-            return DoubleNBT.valueOf(value);
+            return DoubleTag.valueOf(value);
         }
 
         @Override
-        public Double read(INBT nbt)
+        public Double read(Tag tag)
         {
-            return ((DoubleNBT) nbt).getDouble();
+            return ((DoubleTag) tag).getAsDouble();
         }
     };
 
-    public static final IDataSerializer<Character> CHARACTER = new IDataSerializer<Character>()
+    public static final IDataSerializer<Character> CHARACTER = new IDataSerializer<>()
     {
         @Override
-        public void write(PacketBuffer buf, Character value)
+        public void write(FriendlyByteBuf buf, Character value)
         {
             buf.writeChar(value);
         }
 
         @Override
-        public Character read(PacketBuffer buf)
+        public Character read(FriendlyByteBuf buf)
         {
             return buf.readChar();
         }
 
         @Override
-        public INBT write(Character value)
+        public Tag write(Character value)
         {
-            return IntNBT.valueOf(value);
+            return IntTag.valueOf(value);
         }
 
         @Override
-        public Character read(INBT nbt)
+        public Character read(Tag tag)
         {
-            return (char) ((IntNBT) nbt).getInt();
-        }
-    };
-
-    public static final IDataSerializer<String> STRING = new IDataSerializer<String>()
-    {
-        @Override
-        public void write(PacketBuffer buf, String value)
-        {
-            buf.writeString(value);
-        }
-
-        @Override
-        public String read(PacketBuffer buf)
-        {
-            return buf.readString();
-        }
-
-        @Override
-        public INBT write(String value)
-        {
-            return StringNBT.valueOf(value);
-        }
-
-        @Override
-        public String read(INBT nbt)
-        {
-            return nbt.getString();
+            return (char) ((IntTag) tag).getAsInt();
         }
     };
 
-    public static final IDataSerializer<CompoundNBT> TAG_COMPOUND = new IDataSerializer<CompoundNBT>()
+    public static final IDataSerializer<String> STRING = new IDataSerializer<>()
     {
         @Override
-        public void write(PacketBuffer buf, CompoundNBT value)
+        public void write(FriendlyByteBuf buf, String value)
         {
-            buf.writeCompoundTag(value);
+            buf.writeUtf(value);
         }
 
         @Override
-        public CompoundNBT read(PacketBuffer buf)
+        public String read(FriendlyByteBuf buf)
         {
-            return buf.readCompoundTag();
+            return buf.readUtf();
         }
 
         @Override
-        public INBT write(CompoundNBT value)
+        public Tag write(String value)
+        {
+            return StringTag.valueOf(value);
+        }
+
+        @Override
+        public String read(Tag tag)
+        {
+            return tag.getAsString();
+        }
+    };
+
+    public static final IDataSerializer<CompoundTag> TAG_COMPOUND = new IDataSerializer<>()
+    {
+        @Override
+        public void write(FriendlyByteBuf buf, CompoundTag value)
+        {
+            buf.writeNbt(value);
+        }
+
+        @Override
+        public CompoundTag read(FriendlyByteBuf buf)
+        {
+            return buf.readNbt();
+        }
+
+        @Override
+        public Tag write(CompoundTag value)
         {
             return value;
         }
 
         @Override
-        public CompoundNBT read(INBT nbt)
+        public CompoundTag read(Tag tag)
         {
-            return (CompoundNBT) nbt;
+            return (CompoundTag) tag;
         }
     };
 
-    public static final IDataSerializer<BlockPos> BLOCK_POS = new IDataSerializer<BlockPos>()
+    public static final IDataSerializer<BlockPos> BLOCK_POS = new IDataSerializer<>()
     {
         @Override
-        public void write(PacketBuffer buf, BlockPos value)
+        public void write(FriendlyByteBuf buf, BlockPos value)
         {
             buf.writeBlockPos(value);
         }
 
         @Override
-        public BlockPos read(PacketBuffer buf)
+        public BlockPos read(FriendlyByteBuf buf)
         {
             return buf.readBlockPos();
         }
 
         @Override
-        public INBT write(BlockPos value)
+        public Tag write(BlockPos value)
         {
-            return LongNBT.valueOf(value.toLong());
+            return LongTag.valueOf(value.asLong());
         }
 
         @Override
-        public BlockPos read(INBT nbt)
+        public BlockPos read(Tag tag)
         {
-            return BlockPos.fromLong(((LongNBT) nbt).getLong());
+            return BlockPos.of(((LongTag) tag).getAsLong());
         }
     };
 
-    public static final IDataSerializer<UUID> UUID = new IDataSerializer<UUID>()
+    public static final IDataSerializer<UUID> UUID = new IDataSerializer<>()
     {
         @Override
-        public void write(PacketBuffer buf, UUID value)
+        public void write(FriendlyByteBuf buf, UUID value)
         {
-            buf.writeUniqueId(value);
+            buf.writeUUID(value);
         }
 
         @Override
-        public UUID read(PacketBuffer buf)
+        public UUID read(FriendlyByteBuf buf)
         {
-            return buf.readUniqueId();
+            return buf.readUUID();
         }
 
         @Override
-        public INBT write(UUID value)
+        public Tag write(UUID value)
         {
-            CompoundNBT compound = new CompoundNBT();
+            CompoundTag compound = new CompoundTag();
             compound.putLong("Most", value.getMostSignificantBits());
             compound.putLong("Least", value.getLeastSignificantBits());
             return compound;
         }
 
         @Override
-        public UUID read(INBT nbt)
+        public UUID read(Tag tag)
         {
-            CompoundNBT compound = new CompoundNBT();
+            CompoundTag compound = (CompoundTag) tag;
             return new UUID(compound.getLong("Most"), compound.getLong("Least"));
         }
     };
 
-    public static final IDataSerializer<ItemStack> ITEM_STACK = new IDataSerializer<ItemStack>()
+    public static final IDataSerializer<ItemStack> ITEM_STACK = new IDataSerializer<>()
     {
         @Override
-        public void write(PacketBuffer buf, ItemStack value)
+        public void write(FriendlyByteBuf buf, ItemStack value)
         {
-            buf.writeItemStack(value);
+            buf.writeItem(value);
         }
 
         @Override
-        public ItemStack read(PacketBuffer buf)
+        public ItemStack read(FriendlyByteBuf buf)
         {
-            return buf.readItemStack();
+            return buf.readItem();
         }
 
         @Override
-        public INBT write(ItemStack value)
+        public Tag write(ItemStack value)
         {
-            return value.write(new CompoundNBT());
+            return value.save(new CompoundTag());
         }
 
         @Override
-        public ItemStack read(INBT nbt)
+        public ItemStack read(Tag tag)
         {
-            return ItemStack.read((CompoundNBT) nbt);
+            return ItemStack.of((CompoundTag) tag);
         }
     };
 
-    public static final IDataSerializer<ResourceLocation> RESOURCE_LOCATION = new IDataSerializer<ResourceLocation>()
+    public static final IDataSerializer<ResourceLocation> RESOURCE_LOCATION = new IDataSerializer<>()
     {
         @Override
-        public void write(PacketBuffer buf, ResourceLocation value)
+        public void write(FriendlyByteBuf buf, ResourceLocation value)
         {
             buf.writeResourceLocation(value);
         }
 
         @Override
-        public ResourceLocation read(PacketBuffer buf)
+        public ResourceLocation read(FriendlyByteBuf buf)
         {
             return buf.readResourceLocation();
         }
 
         @Override
-        public INBT write(ResourceLocation value)
+        public Tag write(ResourceLocation value)
         {
-            return StringNBT.valueOf(value.toString());
+            return StringTag.valueOf(value.toString());
         }
 
         @Override
-        public ResourceLocation read(INBT nbt)
+        public ResourceLocation read(Tag tag)
         {
-            return ResourceLocation.tryCreate(nbt.getString());
+            return ResourceLocation.tryParse(tag.getAsString());
         }
     };
 }

@@ -1,18 +1,18 @@
 package com.mrcrayfish.obfuscate.common.data;
 
-import net.minecraft.nbt.INBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
 
 /**
  * Author: MrCrayfish
  */
 public interface IDataSerializer<T>
 {
-    void write(PacketBuffer buf, T value);
+    void write(FriendlyByteBuf buf, T value);
 
-    T read(PacketBuffer buf);
+    T read(FriendlyByteBuf buf);
 
-    INBT write(T value);
+    Tag write(T value);
 
-    T read(INBT nbt);
+    T read(Tag nbt);
 }

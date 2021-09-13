@@ -2,8 +2,8 @@ package com.mrcrayfish.obfuscate.network;
 
 import com.mrcrayfish.obfuscate.common.data.SyncedDataKey;
 import com.mrcrayfish.obfuscate.common.data.SyncedPlayerData;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,9 +38,9 @@ public class HandshakeMessages
 
     static class C2SAcknowledge extends LoginIndexedMessage
     {
-        void encode(PacketBuffer buf) {}
+        void encode(FriendlyByteBuf buf) {}
 
-        static C2SAcknowledge decode(PacketBuffer buf)
+        static C2SAcknowledge decode(FriendlyByteBuf buf)
         {
             return new C2SAcknowledge();
         }
@@ -62,7 +62,7 @@ public class HandshakeMessages
             this.keyMap = keyMap;
         }
 
-        void encode(PacketBuffer output)
+        void encode(FriendlyByteBuf output)
         {
             List<SyncedDataKey<?>> keys = SyncedPlayerData.instance().getKeys();
             keys.forEach(syncedDataKey -> {
@@ -71,7 +71,7 @@ public class HandshakeMessages
             });
         }
 
-        static S2CSyncedPlayerData decode(PacketBuffer input)
+        static S2CSyncedPlayerData decode(FriendlyByteBuf input)
         {
             Map<ResourceLocation, Integer> keyMap = new HashMap<>();
             List<SyncedDataKey<?>> keys = SyncedPlayerData.instance().getKeys();

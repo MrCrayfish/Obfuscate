@@ -3,10 +3,10 @@ package com.mrcrayfish.obfuscate.network;
 import com.mrcrayfish.obfuscate.Reference;
 import com.mrcrayfish.obfuscate.network.message.IMessage;
 import com.mrcrayfish.obfuscate.network.message.MessageSyncPlayerData;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.network.FMLHandshakeHandler;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.fmllegacy.network.FMLHandshakeHandler;
+import net.minecraftforge.fmllegacy.network.NetworkRegistry;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 
 /**
  * Author: MrCrayfish
@@ -14,27 +14,30 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
 public class PacketHandler
 {
     private static final String PROTOCOL_VERSION = "OBFUSCATE_V1";
-    private static SimpleChannel handshakeChannel;
-    private static SimpleChannel playChannel;
-    private static int nextId;
-
-    public static void register()
-    {
-        handshakeChannel = NetworkRegistry.ChannelBuilder
+    private static final SimpleChannel HANDSHAKE_CHANNEL = NetworkRegistry.ChannelBuilder
             .named(new ResourceLocation(Reference.MOD_ID, "handshake"))
             .networkProtocolVersion(() -> PROTOCOL_VERSION)
             .clientAcceptedVersions(s -> true)
             .serverAcceptedVersions(s -> true)
             .simpleChannel();
+    private static final SimpleChannel PLAY_CHANNEL = NetworkRegistry.ChannelBuilder
+            .named(new ResourceLocation(Reference.MOD_ID, "play"))
+            .networkProtocolVersion(() -> PROTOCOL_VERSION)
+            .clientAcceptedVersions(s -> true)
+            .serverAcceptedVersions(s -> true)
+            .simpleChannel();
+    private static int nextId;
 
-        handshakeChannel.messageBuilder(HandshakeMessages.C2SAcknowledge.class, 99)
+    public static void register()
+    {
+        HANDSHAKE_CHANNEL.messageBuilder(HandshakeMessages.C2SAcknowledge.class, 99)
             .loginIndex(HandshakeMessages.LoginIndexedMessage::getLoginIndex, HandshakeMessages.LoginIndexedMessage::setLoginIndex)
             .decoder(HandshakeMessages.C2SAcknowledge::decode)
             .encoder(HandshakeMessages.C2SAcknowledge::encode)
             .consumer(FMLHandshakeHandler.indexFirst((handler, msg, s) -> HandshakeHandler.handleAcknowledge(msg, s)))
             .add();
 
-        handshakeChannel.messageBuilder(HandshakeMessages.S2CSyncedPlayerData.class, 1)
+        HANDSHAKE_CHANNEL.messageBuilder(HandshakeMessages.S2CSyncedPlayerData.class, 1)
             .loginIndex(HandshakeMessages.LoginIndexedMessage::getLoginIndex, HandshakeMessages.LoginIndexedMessage::setLoginIndex)
             .decoder(HandshakeMessages.S2CSyncedPlayerData::decode)
             .encoder(HandshakeMessages.S2CSyncedPlayerData::encode)
@@ -42,28 +45,21 @@ public class PacketHandler
             .markAsLoginPacket()
             .add();
 
-        playChannel = NetworkRegistry.ChannelBuilder
-            .named(new ResourceLocation(Reference.MOD_ID, "play"))
-            .networkProtocolVersion(() -> PROTOCOL_VERSION)
-            .clientAcceptedVersions(s -> true)
-            .serverAcceptedVersions(s -> true)
-            .simpleChannel();
-
         registerPlayMessage(MessageSyncPlayerData.class, new MessageSyncPlayerData());
     }
 
     private static <T> void registerPlayMessage(Class<T> clazz, IMessage<T> message)
     {
-        playChannel.registerMessage(nextId++, clazz, message::encode, message::decode, message::handle);
+        PLAY_CHANNEL.registerMessage(nextId++, clazz, message::encode, message::decode, message::handle);
     }
 
     static SimpleChannel getHandshakeChannel()
     {
-        return handshakeChannel;
+        return HANDSHAKE_CHANNEL;
     }
 
     public static SimpleChannel getPlayChannel()
     {
-        return playChannel;
+        return PLAY_CHANNEL;
     }
 }
