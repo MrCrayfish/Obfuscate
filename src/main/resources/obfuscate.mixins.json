@@ -2,7 +2,7 @@
   "required": true,
   "package": "com.mrcrayfish.obfuscate.mixin",
   "plugin": "com.mrcrayfish.obfuscate.mixin.ObfuscateMixinPlugin",
-  "compatibilityLevel": "JAVA_16",
+  "compatibilityLevel": "JAVA_8",
   "minVersion": "0.8",
   "refmap": "obfuscate.refmap.json",
   "mixins": [],

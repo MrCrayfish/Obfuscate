@@ -69,6 +69,7 @@ minecraft {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.17.1-37.0.59'
+    annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
