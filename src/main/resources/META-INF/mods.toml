@@ -5,7 +5,7 @@ issueTrackerURL="https://github.com/MrCrayfish/Obfuscate/issues"
 
 [[mods]]
 modId="obfuscate"
-version="0.6.2"
+version="0.6.3"
 displayName="Obfuscate"
 updateJSONURL="https://mrcrayfish.com/modupdatejson?id=obfuscate"
 displayURL="https://mrcrayfish.com/mods?id=obfuscate"
@@ -17,13 +17,13 @@ description="A simple library that adds in useful events"
 [[dependencies.obfuscate]]
     modId="forge"
     mandatory=true
-    versionRange="[34.1.0,)"
+    versionRange="[36.2.20,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.obfuscate]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.3,1.17)"
+    versionRange="[1.16.5,1.17)"
     ordering="NONE"
     side="BOTH"
 
