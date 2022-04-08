@@ -225,6 +225,7 @@ public class SyncedPlayerData
     public void onPlayerClone(PlayerEvent.Clone event)
     {
         PlayerEntity original = event.getOriginal();
+        original.revive();
         if(!original.world.isRemote)
         {
             PlayerEntity player = event.getPlayer();
@@ -243,6 +244,7 @@ public class SyncedPlayerData
                 }
             }
         }
+        original.remove();
     }
 
     @SubscribeEvent
