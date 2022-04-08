@@ -240,7 +240,7 @@ public class RenderItemEvent extends Event
     {
         public Gui(ItemStack heldItem, MatrixStack matrixStack, IRenderTypeBuffer renderTypeBuffer, int light, int overlay)
         {
-            super(heldItem, ItemCameraTransforms.TransformType.GUI, matrixStack, renderTypeBuffer, light, overlay, Minecraft.getInstance().getRenderPartialTicks());
+            super(heldItem, ItemCameraTransforms.TransformType.GUI, matrixStack, renderTypeBuffer, light, overlay, Minecraft.getInstance().getFrameTime());
         }
 
         /**

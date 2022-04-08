@@ -127,7 +127,7 @@ public class SyncedPlayerData
         DataHolder holder = this.getDataHolder(player);
         if(holder != null && holder.set(player, key, value))
         {
-            if(!player.world.isRemote)
+            if(!player.level.isClientSide)
             {
                 this.dirty = true;
             }
@@ -186,7 +186,7 @@ public class SyncedPlayerData
     @SubscribeEvent
     public void onStartTracking(PlayerEvent.StartTracking event)
     {
-        if(event.getTarget() instanceof PlayerEntity && !event.getPlayer().world.isRemote)
+        if(event.getTarget() instanceof PlayerEntity && !event.getPlayer().level.isClientSide)
         {
             PlayerEntity player = (PlayerEntity) event.getTarget();
             DataHolder holder = this.getDataHolder(player);
@@ -196,7 +196,7 @@ public class SyncedPlayerData
                 entries.removeIf(entry -> !entry.getKey().shouldSyncToAllPlayers());
                 if(!entries.isEmpty())
                 {
-                    PacketHandler.getPlayChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) event.getPlayer()), new MessageSyncPlayerData(player.getEntityId(), entries));
+                    PacketHandler.getPlayChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) event.getPlayer()), new MessageSyncPlayerData(player.getId(), entries));
                 }
             }
         }
@@ -206,7 +206,7 @@ public class SyncedPlayerData
     public void onPlayerJoinWorld(EntityJoinWorldEvent event)
     {
         Entity entity = event.getEntity();
-        if(entity instanceof PlayerEntity && !event.getWorld().isRemote)
+        if(entity instanceof PlayerEntity && !event.getWorld().isClientSide)
         {
             PlayerEntity player = (PlayerEntity) entity;
             DataHolder holder = this.getDataHolder(player);
@@ -215,7 +215,7 @@ public class SyncedPlayerData
                 List<SyncedPlayerData.DataEntry<?>> entries = holder.gatherAll();
                 if(!entries.isEmpty())
                 {
-                    PacketHandler.getPlayChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), new MessageSyncPlayerData(player.getEntityId(), entries));
+                    PacketHandler.getPlayChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), new MessageSyncPlayerData(player.getId(), entries));
                 }
             }
         }
@@ -226,7 +226,7 @@ public class SyncedPlayerData
     {
         PlayerEntity original = event.getOriginal();
         original.revive();
-        if(!original.world.isRemote)
+        if(!original.level.isClientSide)
         {
             PlayerEntity player = event.getPlayer();
             DataHolder oldHolder = this.getDataHolder(original);
@@ -255,7 +255,7 @@ public class SyncedPlayerData
             if(this.dirty)
             {
                 PlayerEntity player = event.player;
-                if(!player.world.isRemote())
+                if(!player.level.isClientSide())
                 {
                     DataHolder holder = this.getDataHolder(player);
                     if(holder != null && holder.isDirty())
@@ -263,11 +263,11 @@ public class SyncedPlayerData
                         List<SyncedPlayerData.DataEntry<?>> entries = holder.gatherDirty();
                         if(!entries.isEmpty())
                         {
-                            PacketHandler.getPlayChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), new MessageSyncPlayerData(player.getEntityId(), entries));
+                            PacketHandler.getPlayChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), new MessageSyncPlayerData(player.getId(), entries));
                             List<SyncedPlayerData.DataEntry<?>> syncToAllEntries = entries.stream().filter(entry -> entry.getKey().shouldSyncToAllPlayers()).collect(Collectors.toList());
                             if(!syncToAllEntries.isEmpty())
                             {
-                                PacketHandler.getPlayChannel().send(PacketDistributor.TRACKING_ENTITY.with(() -> player), new MessageSyncPlayerData(player.getEntityId(), syncToAllEntries));
+                                PacketHandler.getPlayChannel().send(PacketDistributor.TRACKING_ENTITY.with(() -> player), new MessageSyncPlayerData(player.getId(), syncToAllEntries));
                             }
                         }
                         holder.clean();
@@ -300,7 +300,7 @@ public class SyncedPlayerData
             DataEntry<T> entry = (DataEntry<T>) this.dataMap.computeIfAbsent(key, DataEntry::new);
             if(!entry.getValue().equals(value))
             {
-                boolean dirty = !player.world.isRemote && entry.getKey().shouldSyncToClient();
+                boolean dirty = !player.level.isClientSide && entry.getKey().shouldSyncToClient();
                 entry.setValue(value, dirty);
                 this.dirty = dirty;
                 return true;
@@ -448,7 +448,7 @@ public class SyncedPlayerData
             list.forEach(entryTag ->
             {
                 CompoundNBT keyTag = (CompoundNBT) entryTag;
-                ResourceLocation key = ResourceLocation.tryCreate(keyTag.getString("Key"));
+                ResourceLocation key = ResourceLocation.tryParse(keyTag.getString("Key"));
                 INBT value = keyTag.get("Value");
                 SyncedDataKey<?> syncedDataKey = SyncedPlayerData.instance().registeredDataKeys.get(key);
                 if(syncedDataKey != null && syncedDataKey.shouldSave())

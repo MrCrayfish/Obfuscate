@@ -28,7 +28,7 @@ class HandshakeHandler
         c.get().setPacketHandled(true);
         if(!SyncedPlayerData.instance().updateMappings(message))
         {
-            c.get().getNetworkManager().closeChannel(new StringTextComponent("Connection closed - [Obfuscate] received unknown synced data key"));
+            c.get().getNetworkManager().disconnect(new StringTextComponent("Connection closed - [Obfuscate] received unknown synced data key"));
             return;
         }
         PacketHandler.getHandshakeChannel().reply(new HandshakeMessages.C2SAcknowledge(), c.get());

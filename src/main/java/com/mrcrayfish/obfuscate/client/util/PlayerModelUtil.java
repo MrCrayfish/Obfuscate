@@ -55,7 +55,7 @@ public class PlayerModelUtil
     @SuppressWarnings("JavadocReference")
     public static void modifyPlayerModel(IPlayerModelModifier modifier)
     {
-        Map<String, PlayerRenderer> skinMap = Minecraft.getInstance().getRenderManager().getSkinMap();
+        Map<String, PlayerRenderer> skinMap = Minecraft.getInstance().getEntityRenderDispatcher().getSkinMap();
         applyPlayerModelModifier(skinMap.get("default"), modifier, false);
         applyPlayerModelModifier(skinMap.get("slim"), modifier, true);
     }
@@ -63,7 +63,7 @@ public class PlayerModelUtil
     @Deprecated
     private static void applyPlayerModelModifier(PlayerRenderer renderer, IPlayerModelModifier modifier, boolean slim)
     {
-        List<LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>> layers = ObfuscationReflectionHelper.getPrivateValue(LivingRenderer.class, renderer, "field_177097_h");
+        List<LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>> layers = ObfuscationReflectionHelper.getPrivateValue(LivingRenderer.class, renderer, "layers");
         if(layers != null)
         {
             modifier.accept(renderer, layers, slim);

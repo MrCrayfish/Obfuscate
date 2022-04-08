@@ -36,7 +36,7 @@ public class Serializers
         @Override
         public Boolean read(INBT nbt)
         {
-            return ((ByteNBT) nbt).getByte() != 0;
+            return ((ByteNBT) nbt).getAsByte() != 0;
         }
     };
 
@@ -63,7 +63,7 @@ public class Serializers
         @Override
         public Byte read(INBT nbt)
         {
-            return ((ByteNBT) nbt).getByte();
+            return ((ByteNBT) nbt).getAsByte();
         }
     };
 
@@ -90,7 +90,7 @@ public class Serializers
         @Override
         public Short read(INBT nbt)
         {
-            return ((ShortNBT) nbt).getShort();
+            return ((ShortNBT) nbt).getAsShort();
         }
     };
 
@@ -117,7 +117,7 @@ public class Serializers
         @Override
         public Integer read(INBT nbt)
         {
-            return ((IntNBT) nbt).getInt();
+            return ((IntNBT) nbt).getAsInt();
         }
     };
 
@@ -144,7 +144,7 @@ public class Serializers
         @Override
         public Long read(INBT nbt)
         {
-            return ((LongNBT) nbt).getLong();
+            return ((LongNBT) nbt).getAsLong();
         }
     };
 
@@ -171,7 +171,7 @@ public class Serializers
         @Override
         public Float read(INBT nbt)
         {
-            return ((FloatNBT) nbt).getFloat();
+            return ((FloatNBT) nbt).getAsFloat();
         }
     };
 
@@ -198,7 +198,7 @@ public class Serializers
         @Override
         public Double read(INBT nbt)
         {
-            return ((DoubleNBT) nbt).getDouble();
+            return ((DoubleNBT) nbt).getAsDouble();
         }
     };
 
@@ -225,7 +225,7 @@ public class Serializers
         @Override
         public Character read(INBT nbt)
         {
-            return (char) ((IntNBT) nbt).getInt();
+            return (char) ((IntNBT) nbt).getAsInt();
         }
     };
 
@@ -234,13 +234,13 @@ public class Serializers
         @Override
         public void write(PacketBuffer buf, String value)
         {
-            buf.writeString(value);
+            buf.writeUtf(value);
         }
 
         @Override
         public String read(PacketBuffer buf)
         {
-            return buf.readString();
+            return buf.readUtf();
         }
 
         @Override
@@ -252,7 +252,7 @@ public class Serializers
         @Override
         public String read(INBT nbt)
         {
-            return nbt.getString();
+            return nbt.getAsString();
         }
     };
 
@@ -261,13 +261,13 @@ public class Serializers
         @Override
         public void write(PacketBuffer buf, CompoundNBT value)
         {
-            buf.writeCompoundTag(value);
+            buf.writeNbt(value);
         }
 
         @Override
         public CompoundNBT read(PacketBuffer buf)
         {
-            return buf.readCompoundTag();
+            return buf.readNbt();
         }
 
         @Override
@@ -300,13 +300,13 @@ public class Serializers
         @Override
         public INBT write(BlockPos value)
         {
-            return LongNBT.valueOf(value.toLong());
+            return LongNBT.valueOf(value.asLong());
         }
 
         @Override
         public BlockPos read(INBT nbt)
         {
-            return BlockPos.fromLong(((LongNBT) nbt).getLong());
+            return BlockPos.of(((LongNBT) nbt).getAsLong());
         }
     };
 
@@ -315,13 +315,13 @@ public class Serializers
         @Override
         public void write(PacketBuffer buf, UUID value)
         {
-            buf.writeUniqueId(value);
+            buf.writeUUID(value);
         }
 
         @Override
         public UUID read(PacketBuffer buf)
         {
-            return buf.readUniqueId();
+            return buf.readUUID();
         }
 
         @Override
@@ -346,25 +346,25 @@ public class Serializers
         @Override
         public void write(PacketBuffer buf, ItemStack value)
         {
-            buf.writeItemStack(value);
+            buf.writeItem(value);
         }
 
         @Override
         public ItemStack read(PacketBuffer buf)
         {
-            return buf.readItemStack();
+            return buf.readItem();
         }
 
         @Override
         public INBT write(ItemStack value)
         {
-            return value.write(new CompoundNBT());
+            return value.save(new CompoundNBT());
         }
 
         @Override
         public ItemStack read(INBT nbt)
         {
-            return ItemStack.read((CompoundNBT) nbt);
+            return ItemStack.of((CompoundNBT) nbt);
         }
     };
 
@@ -391,7 +391,7 @@ public class Serializers
         @Override
         public ResourceLocation read(INBT nbt)
         {
-            return ResourceLocation.tryCreate(nbt.getString());
+            return ResourceLocation.tryParse(nbt.getAsString());
         }
     };
 }

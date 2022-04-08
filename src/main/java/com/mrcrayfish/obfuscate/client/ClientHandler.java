@@ -30,10 +30,10 @@ public class ClientHandler
 
     public void updatePlayerData(int entityId, List<SyncedPlayerData.DataEntry<?>> entries)
     {
-        World world = Minecraft.getInstance().world;
+        World world = Minecraft.getInstance().level;
         if(world != null)
         {
-            Entity entity = world.getEntityByID(entityId);
+            Entity entity = world.getEntity(entityId);
             if(entity instanceof PlayerEntity)
             {
                 PlayerEntity player = (PlayerEntity) entity;
