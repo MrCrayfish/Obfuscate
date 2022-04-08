@@ -1,12 +1,11 @@
 buildscript {
     repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://maven.minecraftforge.net' }
         maven { url = 'https://repo.spongepowered.org/maven' }
-        jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
@@ -15,11 +14,11 @@ apply plugin: 'org.spongepowered.mixin'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 // apply plugin: 'eclipse'
 
-version = '0.6.2-1.16.3'
+version = '0.6.2-1.16.5'
 group = 'com.mrcrayfish' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'obfuscate'
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 mixin {
     add sourceSets.main, "obfuscate.refmap.json"
@@ -68,7 +67,7 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.3-34.1.0'
+    minecraft 'net.minecraftforge:forge:1.16.5-36.2.20'
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -97,7 +96,7 @@ if(file.exists()) {
     ins.close()
 }
 
-import net.minecraftforge.gradle.common.task.SignJar
+/*import net.minecraftforge.gradle.common.task.SignJar
 
 task signJar(type: SignJar, dependsOn: jar) {
     onlyIf {
@@ -116,4 +115,4 @@ task sourcesJar(type: Jar) {
     from sourceSets.main.allJava
 }
 
-tasks.build.dependsOn signJar, sourcesJar
+tasks.build.dependsOn signJar, sourcesJar*/
